@@ -133,7 +133,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	{
 		ShapeTE te = (ShapeTE)world.getTileEntity(pos);
 		if (te != null) {
-			Trans3 t = te.localToGlobalTransformation(0, 0, 0);
+			Trans3 t = te.localToGlobalTransformation(Vector3.zero);
 			return getCollisionBoxes(te, world, pos, state, t, entity);
 		}
 		return null;
@@ -144,7 +144,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	{
 		ShapeTE te = (ShapeTE)world.getTileEntity(pos);
 		if (te != null) {
-			Trans3 t = te.localToGlobalTransformation(0, 0, 0);
+			Trans3 t = te.localToGlobalTransformation(Vector3.blockCenter);
 			return te.shape.kind.getBounds(te, world, pos, state, entity, t);
 		}
 		return null;

@@ -25,7 +25,7 @@ import gcewing.architecture.BaseMod.*;
 public class SawbenchBlock extends BaseBlock<SawbenchTE> {
 
 	static String model = "block/sawbench.smeg";
-	static String[] textures = {"blocks/sawbench-wood", "blocks/sawbench-metal"};
+	static String[] textures = {"sawbench-wood", "sawbench-metal"};
 	static ModelSpec modelSpec = new ModelSpec(model, textures);
 
 	public SawbenchBlock() {

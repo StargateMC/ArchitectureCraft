@@ -29,7 +29,7 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 	{
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null) {
-			Trans3 t2 = t.t(te.localToGlobalTransformation());
+			Trans3 t2 = t.t(te.localToGlobalRotation());
 			boolean renderBase = te.baseBlockState != null
 				&& te.baseBlockState.getBlock().getBlockLayer() == layer;
 			boolean renderSecondary = te.secondaryBlockState != null
@@ -39,10 +39,10 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 	}
 
 	@Override	
-	public void renderItemStack(ItemStack stack, IRenderTarget target) {
+	public void renderItemStack(ItemStack stack, IRenderTarget target, Trans3 t) {
 		ShapeTE te = new ShapeTE();
 		te.readFromItemStack(stack);
-		renderShapeTE(te, target, Trans3.blockCenter,
+		renderShapeTE(te, target, t,
 			te.baseBlockState != null, te.secondaryBlockState != null);
 	}
 

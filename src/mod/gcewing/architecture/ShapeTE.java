@@ -65,8 +65,8 @@ public class ShapeTE extends BaseTileEntity {
 	}
 	
 	@Override
-	public Trans3 localToGlobalTransformation(double x, double y, double z) {
-		return super.localToGlobalTransformation(x, y, z).translate(getOffsetX(), 0, 0);
+	public Trans3 localToGlobalTransformation(Vector3 origin) {
+		return super.localToGlobalTransformation(origin).translate(getOffsetX(), 0, 0);
 	}
 
 	public boolean connectionIsEnabledGlobal(EnumFacing dir) {

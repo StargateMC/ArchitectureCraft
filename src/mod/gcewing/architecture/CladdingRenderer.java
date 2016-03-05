@@ -20,7 +20,7 @@ public class CladdingRenderer implements ICustomRenderer {
 	public void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state,
 		IRenderTarget target, EnumWorldBlockLayer layer, Trans3 t) {}
 		
-	public void renderItemStack(ItemStack stack, IRenderTarget target) {
+	public void renderItemStack(ItemStack stack, IRenderTarget target, Trans3 t) {
 		NBTTagCompound nbt = stack.getTagCompound();
 		if (nbt != null) {
 			String blockName = nbt.getString("block");
@@ -33,7 +33,7 @@ public class CladdingRenderer implements ICustomRenderer {
 					if (sprite != null) {
 						ITexture texture = BaseTexture.fromSprite(sprite);
 						IModel model = ArchitectureCraft.mod.client.getModel("shape/cladding.smeg");
-						model.render(Trans3.blockCenter, target, texture);
+						model.render(t, target, texture);
 					}
 				}
 			}

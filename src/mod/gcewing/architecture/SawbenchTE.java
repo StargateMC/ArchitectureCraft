@@ -17,7 +17,7 @@ import net.minecraft.world.*;
 import net.minecraftforge.common.util.*;
 import static gcewing.architecture.Shape.*;
 
-public class SawbenchTE extends BaseTileEntity implements IInventory, ISidedInventory {
+public class SawbenchTE extends BaseTileInventory {
 
 	final public static int materialSlot = 0;
 	final public static int resultSlot = 1;
@@ -191,10 +191,8 @@ public class SawbenchTE extends BaseTileEntity implements IInventory, ISidedInve
 						Block materialBlock = Block.getBlockFromItem(materialItem);
 						//System.out.printf("SawbenchTE.updateResultSlot: material block id = %d\n",
 						//	materialBlock.blockID);
-						if (materialBlock.isOpaqueCube()) {
-//							ShapeTE resultTE = new ShapeTE(resultShape, materialBlock, materialStack.getItemDamage());
-//							resultStack = BaseUtils.blockStackWithTileEntity(ArchitectureCraft.blockShape,
-//								resultShape.itemsProduced, resultTE);
+						//if (materialBlock.isOpaqueCube()) {
+						if (!materialBlock.hasTileEntity()) {
 							resultStack = resultShape.kind.newStack(resultShape, materialBlock,
 								materialStack.getItemDamage(), resultShape.itemsProduced);
 						}
