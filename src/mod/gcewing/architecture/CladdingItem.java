@@ -14,7 +14,9 @@ import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 
-public class CladdingItem extends Item {
+import gcewing.architecture.BaseMod.*;
+
+public class CladdingItem extends BaseItem {
 
 	public ItemStack newStack(IBlockState state, int stackSize) {
 		Block block = state.getBlock();
@@ -49,6 +51,11 @@ public class CladdingItem extends Item {
 			if (block != null)
 				lines.add(Utils.displayNameOfBlock(block, meta));
 		}
+	}
+	
+	@Override
+	public int getNumSubtypes() {
+	    return 16;
 	}
 
 }

@@ -24,7 +24,7 @@ public class CladdingRenderer implements ICustomRenderer {
 		NBTTagCompound nbt = stack.getTagCompound();
 		if (nbt != null) {
 			String blockName = nbt.getString("block");
-			int meta = stack.getItemDamage();
+			int meta = stack.getMetadata();
 			Block block = Block.getBlockFromName(blockName);
 			if (block != null) {
 				IBlockState state = block.getStateFromMeta(meta);
