@@ -424,7 +424,7 @@ public abstract class ShapeKind {
 		public boolean acceptsCladding() {
 			BaseModel model = (BaseModel)getModel();
 			for (BaseModel.Face face : model.faces)
-				if (face.texture == 2)
+				if (face.texture >= 2)
 					return true;
 			return false;
 		}
