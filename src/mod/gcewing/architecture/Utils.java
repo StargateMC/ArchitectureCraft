@@ -87,8 +87,11 @@ public class Utils {
 	}
 	
 	public static TextureAtlasSprite getSpriteForBlockState(IBlockState state) {
-		return Minecraft.getMinecraft().getBlockRendererDispatcher()
-			.getBlockModelShapes().getTexture(state);
+	    if (state != null)
+		    return Minecraft.getMinecraft().getBlockRendererDispatcher()
+			    .getBlockModelShapes().getTexture(state);
+		else
+		    return null;
 	}
 	
 	public static String displayNameOfBlock(Block block, int meta) {
