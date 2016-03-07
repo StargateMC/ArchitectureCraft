@@ -408,10 +408,8 @@ public abstract class ShapeKind {
 			ITexture[] textures, IRenderTarget target, Trans3 t,
 			boolean renderBase, boolean renderSecondary)
 		{
-			if (renderBase) {
-				IModel model = getModel();
-				model.render(t, target, textures);
-			}
+            IModel model = getModel();
+            model.render(t, target, textures);
 		}
 		
 		protected IModel getModel() {
