@@ -69,10 +69,11 @@ public class RenderRoof extends RenderShape {
 	//-------------------------------------------------------------------------------------
 
 	protected void renderSlope() {
+	    boolean valley = valleyAt(0, 0, 1);
 		if (renderSecondary) {
 			// Sloping face
 			beginNegZSlope();
-			if (valleyAt(0, 0, 1)) {
+			if (valley) {
 				beginTriangle();
 				vertex(1, 1, 1,   0, 0);
 				vertex(1, 0, 0,   0, 1);
@@ -95,7 +96,6 @@ public class RenderRoof extends RenderShape {
 				vertex(0, 0, 0,   1, 1);
 				vertex(0, 1, 1,   1, 0);
 				endFace();
-				backQuad();
 			}
 		}
 		// Other faces
@@ -103,6 +103,8 @@ public class RenderRoof extends RenderShape {
 			leftTriangle();
 			rightTriangle();
 			bottomQuad();
+			if (!valley)
+			    backQuad();
 		}
 		if (renderSecondary)
 			if (ridgeAt(0, 0, -1))
