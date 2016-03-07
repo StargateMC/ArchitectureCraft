@@ -16,6 +16,8 @@ import net.minecraft.tileentity.*;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
 
+import net.minecraftforge.client.MinecraftForgeClient;
+
 import gcewing.architecture.BaseModClient.*;
 
 public class ShapeRenderDispatch implements ICustomRenderer {
@@ -52,13 +54,17 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 		if (te.shape != null && (renderBase || renderSecondary)) {
 			IBlockState base = te.baseBlockState;
 			if (base != null) {
+			    //System.out.printf("ShapeRenderDispatch.renderShapeTE: in layer %s renderBase = %s renderSecondary = %s\n",
+			    //    MinecraftForgeClient.getRenderLayer(), renderBase, renderSecondary);
 				TextureAtlasSprite icon = Utils.getSpriteForBlockState(base);
+				TextureAtlasSprite icon2 = Utils.getSpriteForBlockState(te.secondaryBlockState);
 				if (icon != null) {
 					ITexture[] textures = new ITexture[4];
-					textures[0] = BaseTexture.fromSprite(icon);
-					textures[1] = textures[0].projected();
+					if (renderBase) {
+					    textures[0] = BaseTexture.fromSprite(icon);
+					    textures[1] = textures[0].projected();
+					}
 					if (renderSecondary) {
-						TextureAtlasSprite icon2 = Utils.getSpriteForBlockState(te.secondaryBlockState);
 						if (icon2 != null) {
 							textures[2] = BaseTexture.fromSprite(icon2);
 							textures[3] = textures[2].projected();
@@ -66,10 +72,13 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 						else
 							renderSecondary = false;
 					}
-					if (renderBase && textures[2] == null && te.shape.kind.secondaryDefaultsToBase()) {
-						textures[2] = textures[0];
-						textures[3] = textures[1];
-						renderSecondary = renderBase;
+					if (renderBase && te.shape.kind.secondaryDefaultsToBase()) {
+					    if (icon2 == null || (te.secondaryBlockState != null &&
+					        te.secondaryBlockState.getBlock().getBlockLayer() != EnumWorldBlockLayer.SOLID)) {
+                                textures[2] = textures[0];
+                                textures[3] = textures[1];
+                                renderSecondary = renderBase;
+                        }
 					}
 					te.shape.kind.renderShape(te, textures, target, t, renderBase, renderSecondary);
 				}
