@@ -122,6 +122,11 @@ public enum Shape {
 	BanisterFancyEnd(87, "Fancy Banister End", Banister("balustrade_stair_fancy_end"), Bilateral, 1, 2, 0x0, placeOffset),
 	
 	BanisterPlainInnerCorner(88, "Plain Banister Inner Corner", Model("balustrade_stair_plain_inner_corner"), Unilateral, 1, 6, 0x0),
+	
+	Slab(90, "Slab", Model("slab"), Quadrilateral, 1, 2, 0x0),
+	Stairs(91, "Stairs", Model("stairs", lrStraight), Bilateral, 3, 4, 0x0),
+	StairsOuterCorner(92, "Stairs Outer Corner", Model("stairs_outer_corner", lrCorner), Unilateral, 2, 3, 0x0),
+	StairsInnerCorner(93, "Stairs Inner Corner", Model("stairs_inner_corner", rlCorner), Unilateral, 1, 1, 0x0),
 
 ;
 

@@ -23,6 +23,7 @@ public class Profile {
 		public static Generic[] lrStraight = {null, null, null, null, RightEnd, LeftEnd};
 		public static Generic[] eeCorner = {null, null, null, End, End, null};
 		public static Generic[] lrCorner = {null, null, null, LeftEnd, RightEnd, null};
+		public static Generic[] rlCorner = {null, null, RightEnd, null, null, LeftEnd};
 		public static Generic[] tOffset = {null, OffsetTop, null, null, null, null};
 		public static Generic[] bOffset = {OffsetBottom,  null, null, null, null, null};
 		public static Generic[] tbOffset = {OffsetBottom, OffsetTop, null, null, null, null};

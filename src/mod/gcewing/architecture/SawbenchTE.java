@@ -60,7 +60,7 @@ public class SawbenchTE extends BaseTileInventory {
 			BalustradeFancy, BalustradeFancyCorner, BalustradeFancyWithNewel, BalustradeFancyNewel,
 			BanisterFancyTop, BanisterFancy, BanisterFancyBottom, BanisterFancyEnd, BanisterFancyNewelTall),
 		new ShapePage("Other",
-			CladdingSheet),
+			CladdingSheet, Slab, Stairs, StairsOuterCorner, StairsInnerCorner),
 	};
 	
 	public IInventory inventory = new InventoryBasic("Items", false, 2);
