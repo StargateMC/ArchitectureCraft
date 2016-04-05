@@ -11,6 +11,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.matthewprenger.cursegradle' version '1.0.7'
+}
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 //version = "1.0"
@@ -50,4 +54,13 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+curseforge {
+  apiKey = '169acfaf-a568-4b2a-95d6-0861213693b5' // This should really be in a gradle.properties file
+  project {
+    id = '242001'
+    changelog = '' // A file can also be set using: changelog = file('changelog.txt')
+    releaseType = 'release'
+  }
 }
