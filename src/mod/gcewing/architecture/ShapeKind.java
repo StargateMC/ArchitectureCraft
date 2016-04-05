@@ -650,20 +650,32 @@ public abstract class ShapeKind {
 			BlockPos npos, IBlockState nstate, TileEntity nte, EnumFacing otherFace, Vector3 hit)
 		{
 			//System.out.printf("Banister.orientOnPlacement: nstate = %s\n", nstate);
-			if (!player.isSneaking() && (otherFace == UP || otherFace == DOWN)) {
-				if (BlockStairs.isBlockStairs(nstate.getBlock())) {
+			if (!player.isSneaking()) {
+			    Block nblock = nstate.getBlock();
+			    boolean placedOnStair = false;
+			    int nside = -1; // Side that the neighbouring block is placed on
+			    int nturn = -1; // Turn of the neighbouring block
+				if (BlockStairs.isBlockStairs(nblock) && (otherFace == UP || otherFace == DOWN)) {
+				    placedOnStair = true;
+				    nside = stairsSide(nstate);
+				    nturn = BaseUtils.turnToFace(SOUTH, stairsFacing(nstate));
+				    if (nside == 1 && (nturn & 1) == 0)
+				        nturn ^= 2;
+				}
+				else if (nblock instanceof ShapeBlock) {
+				    if (nte instanceof ShapeTE) {
+				        placedOnStair = true;
+				        nside = ((ShapeTE)nte).side;
+				        nturn = ((ShapeTE)nte).turn;
+				    }
+				}
+				if (placedOnStair) {
 					int side = otherFace.getOpposite().ordinal();
-					if (side == stairsSide(nstate)) {
+					if (side == nside) {
 						Vector3 h = Trans3.sideTurn(side, 0).ip(hit);
-						int turn = Shape.turnForPlacementHit(side, hit, ShapeSymmetry.Bilateral);
-						int nturn = BaseUtils.turnToFace(NORTH, stairsFacing(nstate));
-						double offx = -te.shape.offsetXForPlacementHit(side, turn, hit);
-						if (offx > 0)
-							turn -= 1;
-						else
-							turn += 1;
+						double offx = te.shape.offsetXForPlacementHit(side, nturn, hit);
 						te.setSide(side);
-						te.setTurn(turn & 3);
+						te.setTurn(nturn & 3);
 						te.setOffsetX(offx);
 						return true;
 					}
