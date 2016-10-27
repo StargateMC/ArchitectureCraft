@@ -173,7 +173,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 			//System.out.printf("ShapeBlock.harvestBlock: spawning %s\n", stack);
 			spawnAsEntity(world, pos, stack);
 			if (ste.secondaryBlockState != null) {
-				stack = BaseUtils.blockStackWithState(ste.secondaryBlockState, 1);
+				stack = ste.shape.kind.newSecondaryMaterialStack(ste.secondaryBlockState);
 				//System.out.printf("ShapeBlock.harvestBlock: spawning %s\n", stack);
 				spawnAsEntity(world, pos, stack);
 			}
