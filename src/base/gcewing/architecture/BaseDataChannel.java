@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.*;
 import net.minecraft.nbt.*;
 import net.minecraft.network.*;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.common.network.*;

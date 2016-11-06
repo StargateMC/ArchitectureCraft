@@ -13,6 +13,7 @@ import net.minecraft.block.state.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
 import static net.minecraft.util.EnumFacing.*;
 

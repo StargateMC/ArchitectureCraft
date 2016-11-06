@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Render block using model + textures
+//   Greg's Mod Base for 1.10 - Render block using model + textures
 //
 //------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
 import gcewing.architecture.BaseMod.*;
 import gcewing.architecture.BaseModClient.*;
@@ -33,7 +34,7 @@ public class BaseModelRenderer implements ICustomRenderer {
     }
 
     public void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target,
-        EnumWorldBlockLayer layer, Trans3 t)
+        BlockRenderLayer layer, Trans3 t)
     {
         IBlock block = (IBlock)state.getBlock();
         Trans3 t2 = t.t(block.localToGlobalTransformation(world, pos, state, Vector3.zero)).translate(origin);

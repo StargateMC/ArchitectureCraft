@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Generic inventory container
+//   Greg's Mod Base for 1.10 - Generic inventory container
 //
 //------------------------------------------------------------------------------------------------
 
@@ -72,19 +72,20 @@ public class BaseContainer extends Container {
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        for (int i = 0; i < crafters.size(); i++) {
-            ICrafting crafter = (ICrafting)crafters.get(i);
-            sendStateTo(crafter);
+        for (int i = 0; i < listeners.size(); i++) {
+            IContainerListener listener = listeners.get(i);
+            sendStateTo(listener);
         }
     }
     
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-        // TODO: Try to come up with a generic way of implementing this
-        return null;
-    }
+//     Is it safe to leave this un-overridden now?
+//     @Override
+//     public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
+//         // TODO: Try to come up with a generic way of implementing this
+//         return null;
+//     }
 
-    void sendStateTo(ICrafting crafter) {
+    void sendStateTo(IContainerListener listener) {
     }
 
     public void updateProgressBar(int i, int value) {

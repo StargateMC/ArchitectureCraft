@@ -12,7 +12,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.network.play.server.*;
 import net.minecraft.tileentity.*;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.*;
 
 import gcewing.architecture.BaseDataChannel.*;
@@ -72,14 +72,14 @@ public class SawbenchContainer extends BaseContainer {
 			{
 				oldstack = newstack == null ? null : newstack.copy();
 				this.inventoryItemStacks.set(i, oldstack);
-				for (Object crafter : crafters) {
-					if (crafter instanceof EntityPlayerMP) {
+				for (Object listener : listeners) {
+					if (listener instanceof EntityPlayerMP) {
 						//System.out.printf("SawbenchContainer.updateCraftingResults: sending %s in slot %d to player\n", newstack, i);
-						((EntityPlayerMP)crafter).playerNetServerHandler.sendPacket(
-							new S2FPacketSetSlot(windowId, i, newstack));
+						((EntityPlayerMP)listener).connection.sendPacket(
+							new SPacketSetSlot(windowId, i, newstack));
 					}
 					else
-						((ICrafting)crafter).sendSlotContents(this, i, newstack);
+						((IContainerListener)listener).sendSlotContents(this, i, newstack);
 				}
 			}
 		}

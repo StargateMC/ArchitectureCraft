@@ -18,6 +18,7 @@ import net.minecraft.init.*;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 public class HammerItem extends Item {
@@ -28,19 +29,22 @@ public class HammerItem extends Item {
 	
 	@Override
 	public CreativeTabs getCreativeTab() {
-		return CreativeTabs.tabTools;
+		return CreativeTabs.TOOLS;
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player,
-		World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player,
+		World world, BlockPos pos, EnumHand hand, EnumFacing side,
+		float hitX, float hitY, float hitZ)
 	{
+	    System.out.printf("HammerItem.onItemUse\n");
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null) {
+		    System.out.printf("HammerItem.onItemUse: te = %s\n", te);
 			te.onHammerUse(player, side, hitX, hitY, hitZ);
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
-		return false;
+		return EnumActionResult.FAIL;
 	}
 
 }

@@ -14,6 +14,7 @@ import net.minecraft.block.state.*;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import gcewing.architecture.BaseBlock.IOrientationHandler;

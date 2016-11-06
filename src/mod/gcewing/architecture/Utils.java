@@ -23,6 +23,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 public class Utils {
@@ -83,7 +84,7 @@ public class Utils {
 	
 	public static boolean playerIsInCreativeMode(EntityPlayer player) {
 		return (player instanceof EntityPlayerMP)
-			&& ((EntityPlayerMP)player).theItemInWorldManager.isCreative();
+			&& ((EntityPlayerMP)player).interactionManager.isCreative();
 	}
 	
 	public static TextureAtlasSprite getSpriteForBlockState(IBlockState state) {

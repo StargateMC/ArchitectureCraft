@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Generic Client Proxy
+//   Greg's Mod Base for 1.10 - Generic Client Proxy
 //
 //------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ import java.lang.reflect.*;
 import java.lang.Thread;
 
 import static org.lwjgl.opengl.GL11.*;
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
@@ -26,8 +27,7 @@ import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.renderer.tileentity.*;
-import net.minecraft.client.resources.model.*;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.creativetab.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
@@ -36,6 +36,7 @@ import net.minecraft.item.*;
 import net.minecraft.network.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import net.minecraftforge.common.*;
@@ -112,9 +113,9 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     }
     
     void registerSavedVillagerSkins() {
-        VillagerRegistry reg = VillagerRegistry.instance();
-        for (VSBinding b : base.registeredVillagers)
-            reg.registerVillagerSkin(b.id, b.object);
+//         VillagerRegistry reg = VillagerRegistry.instance();
+//         for (VSBinding b : base.registeredVillagers)
+//             reg.registerVillagerSkin(b.id, b.object);
     }
         
 //  String qualifyName(String name) {
@@ -304,7 +305,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     
     public interface ICustomRenderer {
         void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target,
-            EnumWorldBlockLayer layer, Trans3 t);
+            BlockRenderLayer layer, Trans3 t);
         void renderItemStack(ItemStack stack, IRenderTarget target, Trans3 t);
     }
     
@@ -441,12 +442,12 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
             this.state = state;
         }
         
-        public List<BakedQuad> getFaceQuads(EnumFacing p_177551_1_) {return null;}
-        public List<BakedQuad> getGeneralQuads() {return null;}
+        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {return null;}
         public boolean isAmbientOcclusion() {return false;}
         public boolean isGui3d() {return false;}
         public boolean isBuiltInRenderer() {return false;}
         public ItemCameraTransforms getItemCameraTransforms() {return null;}
+        public ItemOverrideList getOverrides() {return null;}
         
         public TextureAtlasSprite getParticleTexture() {
             Block block = state.getBlock();
@@ -530,24 +531,25 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     }
     
     protected ICustomRenderer getCustomRendererForSpec(int textureType, ModelSpec spec) {
-        //System.out.printf("BaseModClient.getCustomRendererForSpec: %s", spec.modelName);
-        //for (int i = 0; i < spec.textureNames.length; i++)
-        //  System.out.printf(" %s", spec.textureNames[i]);
-        //System.out.printf("\n");
+//         System.out.printf("BaseModClient.getCustomRendererForSpec: %s\n", spec.modelName);
+//         for (int i = 0; i < spec.textureNames.length; i++)
+//           System.out.printf(" %s", spec.textureNames[i]);
+//         System.out.printf("\n");
         IModel model = getModel(spec.modelName);
         ITexture[] textures = new ITexture[spec.textureNames.length];
         for (int i = 0; i < textures.length; i++)
             textures[i] = getTexture(textureType, spec.textureNames[i]);
-        //for (int i = 0; i < spec.textureNames.length; i++)
-        //  System.out.printf("BaseModClient.getCustomRendererForSpec: texture[%s] = %s\n",
-        //      i, textures[i]);
+//         System.out.printf("BaseModClient.getCustomRendererForSpec: model = %s\n", model);
+//         for (int i = 0; i < spec.textureNames.length; i++)
+//           System.out.printf("BaseModClient.getCustomRendererForSpec: texture[%s] = %s\n",
+//               i, textures[i]);
         return new BaseModelRenderer(model, spec.origin, textures);
     }
     
     protected ICustomRenderer getCustomRendererForState(IBlockState astate) {
-        //System.out.printf("BaseModClient.getCustomRendererForState: %s\n", astate);
         ICustomRenderer rend = stateRendererCache.get(astate);
         if (rend == null) {
+//             System.out.printf("BaseModClient.getCustomRendererForState: %s\n", astate);
             Block block = astate.getBlock();
             if (block instanceof IBlock) {
                 ModelSpec spec = ((IBlock)block).getModelSpec(astate);
@@ -561,7 +563,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     }
     
     public void renderBlockUsingModelSpec(IBlockAccess world, BlockPos pos, IBlockState state,
-        IRenderTarget target, EnumWorldBlockLayer layer, Trans3 t)
+        IRenderTarget target, BlockRenderLayer layer, Trans3 t)
     {
         ICustomRenderer rend = getCustomRendererForState(state);
         if (rend != null)
@@ -604,10 +606,10 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
         textureCache.clear();
         for (Block block : base.registeredBlocks) {
             //System.out.printf("BaseModClient.onTextureStitchEvent: Block %s\n", block.getUnlocalizedName());
-            registerSprites(0, e.map, block);
+            registerSprites(0, e.getMap(), block);
         }
         for (Item item : base.registeredItems)
-            registerSprites(1, e.map, item);
+            registerSprites(1, e.getMap(), item);
     }
     
     protected void registerSprites(int textureType, TextureMap reg, Object obj) {
@@ -646,12 +648,10 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
             {return base.getBlockModelShapes();}
         @Override public BlockModelRenderer getBlockModelRenderer()
             {return base.getBlockModelRenderer();}
-        @Override public IBakedModel getModelFromBlockState(IBlockState state, IBlockAccess world, BlockPos pos)
-            {return base.getModelFromBlockState(state, world, pos);}
+        @Override public IBakedModel getModelForState(IBlockState state)
+            {return base.getModelForState(state);}
         @Override public void renderBlockBrightness(IBlockState state, float brightness)
             {base.renderBlockBrightness(state, brightness);}
-        @Override public boolean isRenderTypeChest(Block block, int i)
-            {return base.isRenderTypeChest(block, i);}
 
         @Override
         public void renderBlockDamage(IBlockState state, BlockPos pos, TextureAtlasSprite icon, IBlockAccess world) {
@@ -660,12 +660,12 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
                 BaseBakedRenderTarget target = new BaseBakedRenderTarget(pos, icon);
                 Trans3 t = Trans3.blockCenter;
                 Block block = state.getBlock();
-                for (EnumWorldBlockLayer layer : EnumWorldBlockLayer.values())
+                for (BlockRenderLayer layer : BlockRenderLayer.values())
                     if (block.canRenderInLayer(layer))
                         rend.renderBlock(world, pos, state, target, layer, t);
                 IBakedModel model = target.getBakedModel();
-                WorldRenderer tess = Tessellator.getInstance().getWorldRenderer();
-                getBlockModelRenderer().renderModel(world, model, state, pos, tess);
+                VertexBuffer tess = Tessellator.getInstance().getBuffer();
+                getBlockModelRenderer().renderModel(world, model, state, pos, tess, false); //TODO chould checkSides be false?
             }
             else
                 base.renderBlockDamage(state, pos, icon, world);
@@ -697,7 +697,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
 //      }
 
         @Override
-        public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess world, WorldRenderer tess) {
+        public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess world, VertexBuffer tess) {
             ICustomRenderer rend = getCustomRenderer(world, pos, state);
             if (rend != null)
                 return customRenderBlockToWorld(world, pos, state, tess, null, rend);
@@ -707,12 +707,12 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
         
     }
     
-    protected boolean customRenderBlockToWorld(IBlockAccess world, BlockPos pos, IBlockState state, WorldRenderer tess,
+    protected boolean customRenderBlockToWorld(IBlockAccess world, BlockPos pos, IBlockState state, VertexBuffer tess,
         TextureAtlasSprite icon, ICustomRenderer rend)
     {
         //System.out.printf("BaseModClient.customRenderBlock: %s\n", state);
         BaseWorldRenderTarget target = new BaseWorldRenderTarget(world, pos, tess, icon);
-        EnumWorldBlockLayer layer = MinecraftForgeClient.getRenderLayer();
+        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
         rend.renderBlock(world, pos, state, target, layer, Trans3.blockCenter(pos));
         return target.end();
     }
@@ -722,7 +722,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     {
         BaseBakedRenderTarget target = new BaseBakedRenderTarget(pos);
         Trans3 t = Trans3.blockCenter;
-        EnumWorldBlockLayer layer = MinecraftForgeClient.getRenderLayer();
+        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
         BlockModelShapes shapes = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes();
         TextureAtlasSprite particle = shapes.getTexture(getBlockParticleState(state, world, pos));
         rend.renderBlock(world, pos, state, target, layer, t);
@@ -743,7 +743,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
         if (!block.hasTileEntity(state)) {
             try {
                 BlockRendererDispatcher disp = getCustomBlockRendererDispatcher();
-                WorldRenderer tess = ((BaseWorldRenderTarget)target).getWorldRenderer();
+                VertexBuffer tess = ((BaseWorldRenderTarget)target).getWorldRenderer();
                 return disp.renderBlock(state, pos, world, tess);
             }
             catch (Exception e) {
@@ -756,25 +756,24 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
 
     //------------------------------------------------------------------------------------------------
 
-    protected class CustomRenderDispatch implements IBakedModel {
+    protected abstract class CustomRenderDispatch implements IBakedModel {
     
         public ModelResourceLocation modelLocation;
         
         public void install(ModelBakeEvent event) {
             if (debugModelRegistration)
                 System.out.printf("BaseModClient: Installing %s at %s\n", this, modelLocation);
-            event.modelRegistry.putObject(modelLocation, this);
+            event.getModelRegistry().putObject(modelLocation, this);
         }
     
         // ----- IBakedModel -----
         
-    public List<BakedQuad> getFaceQuads(EnumFacing p_177551_1_) {return null;}
-    public List<BakedQuad> getGeneralQuads() {return null;}
-    public boolean isAmbientOcclusion() {return false;}
-    public boolean isGui3d() {return false;}
-    public boolean isBuiltInRenderer() {return false;}
-    public TextureAtlasSprite getParticleTexture() {return null;}
-    public ItemCameraTransforms getItemCameraTransforms() {return null;}
+        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {return null;}
+        public boolean isAmbientOcclusion() {return false;}
+        public boolean isGui3d() {return false;}
+        public boolean isBuiltInRenderer() {return false;}
+        public TextureAtlasSprite getParticleTexture() {return null;}
+        public ItemCameraTransforms getItemCameraTransforms() {return null;}
         
     }
     
@@ -813,38 +812,50 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
     
     protected static Trans3 itemTrans = Trans3.blockCenterSideTurn(0, 2);
 
-    protected class CustomItemRenderDispatch extends CustomRenderDispatch implements ISmartItemModel {
+    protected class CustomItemRenderDispatch extends CustomRenderDispatch {
     
         public CustomItemRenderDispatch() {
             modelLocation = modelResourceLocation("__custitem__", "");
         }
         
-        // ----- ISmartItemModel -----
+        private class CustomItemRenderOverrideList extends ItemOverrideList {
         
-        public IBakedModel handleItemState(ItemStack stack) {
-            //System.out.printf("BaseModClient.CustomItemRenderDispatch.handleItemState: %s\n", stack);
-            Item item = stack.getItem();
-            ICustomRenderer rend = itemRenderers.get(item);
-            if (rend == null && item instanceof IItem) {
-                ModelSpec spec = ((IItem)item).getModelSpec(stack);
-                if (spec != null)
-                    rend = getCustomRendererForSpec(1, spec);
+            public CustomItemRenderOverrideList() {
+                super(ImmutableList.<ItemOverride>of());
             }
-            if (rend == null) {
-                Block block = Block.getBlockFromItem(item);
-                if (block != null)
-                    rend = getCustomRendererForState(block.getDefaultState());
+            
+            @Override
+            public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
+                //System.out.printf("BaseModClient.CustomItemRenderDispatch.handleItemState: %s\n", stack);
+                Item item = stack.getItem();
+                ICustomRenderer rend = itemRenderers.get(item);
+                if (rend == null && item instanceof IItem) {
+                    ModelSpec spec = ((IItem)item).getModelSpec(stack);
+                    if (spec != null)
+                        rend = getCustomRendererForSpec(1, spec);
+                }
+                if (rend == null) {
+                    Block block = Block.getBlockFromItem(item);
+                    if (block != null)
+                        rend = getCustomRendererForState(block.getDefaultState());
+                }
+                if (rend != null) {
+                    GlStateManager.shadeModel(GL_SMOOTH);
+                    BaseBakedRenderTarget target = new BaseBakedRenderTarget();
+                    rend.renderItemStack(stack, target, itemTrans);
+                    return target.getBakedModel();
+                }
+                else
+                    return null;
             }
-            if (rend != null) {
-                GlStateManager.shadeModel(GL_SMOOTH);
-                BaseBakedRenderTarget target = new BaseBakedRenderTarget();
-                rend.renderItemStack(stack, target, itemTrans);
-                return target.getBakedModel();
-            }
-            else
-                return null;
+
         }
         
+        @Override
+        public ItemOverrideList getOverrides() {
+            return new CustomItemRenderOverrideList();
+        }
+
     }
 
     //------------------------------------------------------------------------------------------------
@@ -862,7 +873,7 @@ public class BaseModClient<MOD extends BaseMod<? extends BaseModClient>> impleme
         for (Map.Entry<ModelResourceLocation, IBakedModel> e : smartModels.entrySet()) {
             if (debugModelRegistration)
                 System.out.printf("BaseModClient.onModelBakeEvent: Installing %s --> %s\n", e.getKey(), e.getValue());
-            event.modelRegistry.putObject(e.getKey(), e.getValue());
+            event.getModelRegistry().putObject(e.getKey(), e.getValue());
         }
     }
     

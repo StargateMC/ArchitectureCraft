@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Generic GUI Screen
+//   Greg's Mod Base for 1.10 - Generic GUI Screen
 //
 //------------------------------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.util.*;
+import net.minecraft.util.text.translation.I18n;
 
 import net.minecraftforge.client.*;
 
@@ -37,7 +38,7 @@ public class BaseGui {
         protected Root root;
         protected String title;
         protected Tessellator tess;
-        protected WorldRenderer wr;
+        protected VertexBuffer vb;
         protected IWidget mouseWidget;
         protected GState gstate;
     
@@ -47,7 +48,7 @@ public class BaseGui {
             ySize = height;
             root = new Root(this);
             tess = Tessellator.getInstance();
-            wr = tess.getWorldRenderer();
+            vb = tess.getBuffer();
             gstate = new GState();
         }
         
@@ -277,7 +278,7 @@ public class BaseGui {
         }
         
         public static String playerInventoryName() {
-            return StatCollector.translateToLocal("container.inventory");
+            return I18n.translateToLocal("container.inventory");
         }
         
 //      @Override

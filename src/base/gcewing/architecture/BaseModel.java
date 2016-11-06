@@ -11,7 +11,7 @@ import java.util.*;
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.math.AxisAlignedBB;
 import gcewing.architecture.BaseModClient.*;
 
 public class BaseModel implements IModel {

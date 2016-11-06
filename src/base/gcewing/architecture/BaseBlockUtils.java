@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Block Utilities
+//   Greg's Mod Base for 1.10 - Block Utilities
 //
 //------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import net.minecraftforge.common.util.*;
 
@@ -21,7 +22,7 @@ import static gcewing.architecture.BaseUtils.*;
 public class BaseBlockUtils {
 
     public static String getNameForBlock(Block block) {
-        return Block.blockRegistry.getNameForObject(block).toString();
+        return Block.REGISTRY.getNameForObject(block).toString();
     }
     
     /*
@@ -40,9 +41,9 @@ public class BaseBlockUtils {
     static boolean isPoweringSide(World world, BlockPos pos, EnumFacing side) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (block.getWeakPower(world, pos, state, side) > 0)
+        if (block.getWeakPower(state, world, pos, side) > 0)
             return true;
-        if (block.shouldCheckWeakPower(world, pos, side)) {
+        if (block.shouldCheckWeakPower(state, world, pos, side)) {
             for (EnumFacing side2 : facings)
                 if (side2 != side.getOpposite())
                     if (world.getStrongPower(pos.offset(side2), side2) > 0)
@@ -81,9 +82,9 @@ public class BaseBlockUtils {
         world.setBlockState(pos, state, 3);
     }
     
-    public static void markWorldBlockForUpdate(World world, BlockPos pos) {
-        world.markBlockForUpdate(pos);
-    }   
+//     public static void markWorldBlockForUpdate(World world, BlockPos pos) {
+//         world.markBlockForUpdate(pos);
+//     }   
     
     public static void notifyWorldNeighborsOfStateChange(World world, BlockPos pos, Block block) {
         world.notifyNeighborsOfStateChange(pos, block);
@@ -101,7 +102,7 @@ public class BaseBlockUtils {
         return te.getPos();
     }
     
-    public static boolean blockCanRenderInLayer(Block block, EnumWorldBlockLayer layer) {
+    public static boolean blockCanRenderInLayer(Block block, BlockRenderLayer layer) {
         return block.canRenderInLayer(layer);
     }
     

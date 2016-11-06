@@ -18,6 +18,7 @@ import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import gcewing.architecture.BaseMod.*;
@@ -29,7 +30,7 @@ public class SawbenchBlock extends BaseBlock<SawbenchTE> {
 	static ModelSpec modelSpec = new ModelSpec(model, textures);
 
 	public SawbenchBlock() {
-		super(Material.wood, SawbenchTE.class);
+		super(Material.WOOD, SawbenchTE.class);
 		//renderID = -1;
 	}
 	
@@ -54,18 +55,18 @@ public class SawbenchBlock extends BaseBlock<SawbenchTE> {
 //	}
 	
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player,
-		EnumFacing side, float hitX, float hitY, float hitZ)
+		EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
 		//System.out.printf("SawbenchBlock.onBlockActivated\n");
 		if (!player.isSneaking()) {

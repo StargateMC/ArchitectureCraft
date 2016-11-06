@@ -18,7 +18,7 @@ import net.minecraft.block.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.init.*;
 import net.minecraft.item.*;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import net.minecraftforge.common.*;
@@ -33,8 +33,9 @@ import gcewing.architecture.BaseDataChannel.*;
 	modid = Info.modID,
 	name = Info.modName,
 	version = Info.versionNumber,
-	acceptableRemoteVersions = Info.versionBounds,
-	acceptedMinecraftVersions = Info.acceptedMinecraftVersions)
+	acceptableRemoteVersions = Info.versionBounds
+	//,acceptedMinecraftVersions = Info.acceptedMinecraftVersions
+	)
 
 public class ArchitectureCraft extends BaseMod<ArchitectureCraftClient> {
 
@@ -105,27 +106,27 @@ public class ArchitectureCraft extends BaseMod<ArchitectureCraftClient> {
 			"I*I",
 			"/0/",
 			"/_/",
-			'I', Items.iron_ingot, '*', itemSawblade, '/', Items.stick, 
-			'_', Blocks.wooden_pressure_plate, '0', itemLargePulley);
+			'I', Items.IRON_INGOT, '*', itemSawblade, '/', Items.STICK, 
+			'_', Blocks.WOODEN_PRESSURE_PLATE, '0', itemLargePulley);
 		newRecipe(itemSawblade, 1,
 			" I ",
 			"I/I",
 			" I ",
-			'I', Items.iron_ingot, '/', Items.stick);
+			'I', Items.IRON_INGOT, '/', Items.STICK);
 		newRecipe(itemLargePulley, 1,
 			" W ",
 			"W/W",
 			" W ",
-			'W', Blocks.planks, '/', Items.stick);
+			'W', Blocks.PLANKS, '/', Items.STICK);
 		newRecipe(itemChisel, 1,
 			"I",
 			"s",
-			'I', Items.iron_ingot, 's', Items.stick);
+			'I', Items.IRON_INGOT, 's', Items.STICK);
 		newRecipe(itemHammer, 1,
 			"II ",
 			" sI",
 			" s ",
-			'I', Items.iron_ingot, 's', Items.stick);
+			'I', Items.IRON_INGOT, 's', Items.STICK);
 }
 	
 	//--------------- GUIs ----------------------------------------------------------

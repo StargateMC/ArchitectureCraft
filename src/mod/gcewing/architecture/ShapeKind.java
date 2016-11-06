@@ -19,6 +19,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.world.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
 import static net.minecraft.util.EnumFacing.*;
 
@@ -106,7 +107,6 @@ public abstract class ShapeKind {
 	}
 	
 	public void chiselUsedOnSide(ShapeTE te, EntityPlayer player, EnumFacing side) {
-		//System.out.printf("ShapeKind.chiselUsedOnSide: %s\n", side);
 		te.toggleConnectionGlobal(side);
 	}
 
@@ -537,7 +537,7 @@ public abstract class ShapeKind {
 		@Override
 		public boolean isValidSecondaryMaterial(IBlockState state) {
 			Block block = state.getBlock();
-			return block == Blocks.glass_pane || block == Blocks.stained_glass_pane;
+			return block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS_PANE;
 		}
 		
 		@Override	
@@ -655,7 +655,7 @@ public abstract class ShapeKind {
 			    boolean placedOnStair = false;
 			    int nside = -1; // Side that the neighbouring block is placed on
 			    int nturn = -1; // Turn of the neighbouring block
-				if (BlockStairs.isBlockStairs(nblock) && (otherFace == UP || otherFace == DOWN)) {
+				if (BlockStairs.isBlockStairs(nstate) && (otherFace == UP || otherFace == DOWN)) {
 				    placedOnStair = true;
 				    nside = stairsSide(nstate);
 				    nturn = BaseUtils.turnToFace(SOUTH, stairsFacing(nstate));

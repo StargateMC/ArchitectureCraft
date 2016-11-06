@@ -14,7 +14,7 @@ import net.minecraft.client.gui.inventory.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.tileentity.*;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.*;
 
 import gcewing.architecture.BaseDataChannel.*;

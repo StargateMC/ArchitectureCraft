@@ -12,13 +12,14 @@ import net.minecraft.client.renderer.texture.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import gcewing.architecture.BaseModClient.*;
 
 public class CladdingRenderer implements ICustomRenderer {
 
 	public void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state,
-		IRenderTarget target, EnumWorldBlockLayer layer, Trans3 t) {}
+		IRenderTarget target, BlockRenderLayer layer, Trans3 t) {}
 		
 	public void renderItemStack(ItemStack stack, IRenderTarget target, Trans3 t) {
 		NBTTagCompound nbt = stack.getTagCompound();

@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Rendering target generating a baked model
+//   Greg's Mod Base for 1.10 - Rendering target generating a baked model
 //
 //------------------------------------------------------------------------------------------------
 
@@ -17,9 +17,10 @@ import net.minecraft.block.state.*;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.renderer.vertex.*;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import static net.minecraft.client.renderer.vertex.DefaultVertexFormats.*;
@@ -43,10 +44,10 @@ public class BaseBakedRenderTarget extends BaseRenderTarget {
     }
 
     protected static List<BakedQuad> emptyQuads = new ArrayList<BakedQuad>();
-    protected static List<List<BakedQuad>> faceQuads = new ArrayList<List<BakedQuad>>();
+    protected static Map<EnumFacing, List<BakedQuad>> faceQuads = new HashMap<>();
     static {
-        for (int i = 0; i < 6; i++)
-            faceQuads.add(emptyQuads);
+       for (EnumFacing face : EnumFacing.VALUES)
+           faceQuads.put(face, emptyQuads);
     }
 
     //protected VertexFormat format = Attributes.DEFAULT_BAKED_FORMAT;
@@ -105,7 +106,7 @@ public class BaseBakedRenderTarget extends BaseRenderTarget {
         //quads.add(new BakedQuad(data, 0, normal.facing()));
         //System.out.printf("BaseBakedRenderTarget.endFace: Adding quad facing %s\n", face);
         //quads.add(new BakedQuad(data, 0, face));
-        quads.add(new IColoredBakedQuad.ColoredBakedQuad(data, 0, EnumFacing.UP));
+        quads.add(new BakedQuad(data, 0, EnumFacing.UP, null)); //FIXME I don't think there should be a null here    }
     }
     
 //  protected void dumpVertexData(int[] data, int n) {
@@ -141,16 +142,47 @@ public class BaseBakedRenderTarget extends BaseRenderTarget {
 
     //------------------------------------------------------------------------------------------
     
+    static protected ItemTransformVec3f
+    
+        transThirdPerson = new ItemTransformVec3f(
+            new Vector3f(75f, 45f, 0f),
+            new Vector3f(0f, 2.5f/16f, 0f),
+            new Vector3f(0.375f, 0.375f, 0.375f)),
+        
+        transFirstPerson = new ItemTransformVec3f(
+            new Vector3f(0f, 45f, 0f),
+            new Vector3f(0f, 0f, 0f),
+            new Vector3f(0.4f, 0.4f, 0.4f)),
+        
+        transOnHead = new ItemTransformVec3f(
+            new Vector3f(0f, 180f, 0f),
+            new Vector3f(0f, 13f/16f, 7f/16f),
+            new Vector3f(1f, 1f, 1f)),
+        
+        transInGui = new ItemTransformVec3f(
+            new Vector3f(30f, 45f, 0f),
+            new Vector3f(0f, 0f, 0f),
+            new Vector3f(0.625f, 0.625f, 0.625f)),
+        
+        transOnGround = new ItemTransformVec3f(
+            new Vector3f(0f, 0f, 0f),
+            new Vector3f(0f, 3f/16f, 0f),
+            new Vector3f(0.25f, 0.25f, 0.25f)),
+        
+        transFixed = new ItemTransformVec3f(
+            new Vector3f(0f, 0f, 0f),
+            new Vector3f(0f, 0f, 0f),
+            new Vector3f(0.5f, 0.5f, 0.5f));
+
     static protected ItemCameraTransforms transforms = new ItemCameraTransforms(
-        new ItemTransformVec3f(
-            new Vector3f(10f, -45f, 170f),
-            new Vector3f(0f, 1.5f/16f, -2.75f/16f),
-            new Vector3f(0.375f, 0.375f, 0.375f)), // thirdPerson
-        ItemCameraTransforms.DEFAULT.firstPerson,
-        ItemCameraTransforms.DEFAULT.head,
-        ItemCameraTransforms.DEFAULT.gui,
-        ItemCameraTransforms.DEFAULT.ground,
-        ItemCameraTransforms.DEFAULT.fixed
+        transThirdPerson, // thirdPerson_left
+        transThirdPerson, // thirdPerson_right
+        transFirstPerson, // firstperson_left
+        transFirstPerson, // firstperson_right
+        transOnHead, // head,
+        transInGui, // gui
+        transOnGround, // ground
+        transFixed // fixed
     );
 
     public IBakedModel getBakedModel() {
@@ -164,14 +196,16 @@ public class BaseBakedRenderTarget extends BaseRenderTarget {
         //  Tessellator.getInstance().getWorldRenderer().getVertexFormat());
         if (verticesPerFace != 0)
             throw new IllegalStateException("Rendering ended with incomplete face");
-        return new SimpleBakedModel(quads, faceQuads, false, true, particleTexture, transforms);
+        return new SimpleBakedModel(quads, faceQuads, false, true, particleTexture, transforms, ItemOverrideList.NONE);
     }
     
+    @Override
     protected void rawAddVertex(Vector3 p, double u, double v) {
         //System.out.printf("BaseBakedRenderTarget.rawAddVertex: color (%.3f,%.3f,%.3f,%.3f) normal %s\n",
         //  red, green, blue, alpha, normal);
         //System.out.printf("BaseBakedRenderTarget.rawAddVertex:\n");
-        for (VertexFormatElement e : (List<VertexFormatElement>)format.getElements()) {
+        //for (VertexFormatElement e : (List<VertexFormatElement>)format.getElements()) {
+        for (VertexFormatElement e : format.getElements()) {
             //System.out.printf("%s\n", e);
             switch(e.getUsage()) {
                 case POSITION:

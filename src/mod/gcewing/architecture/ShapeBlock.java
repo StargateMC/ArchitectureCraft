@@ -19,8 +19,9 @@ import net.minecraft.item.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
-import net.minecraft.client.particle.EffectRenderer;
+//import net.minecraft.client.particle.EffectRenderer;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.*;
 
@@ -31,7 +32,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	protected AxisAlignedBB boxHit;
 
 	public ShapeBlock() {
-		super(Material.rock, ShapeTE.class);
+		super(Material.ROCK, ShapeTE.class);
 		//renderID = -1;
 	}
 	
@@ -41,26 +42,25 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public MovingObjectPosition collisionRayTrace(World world, BlockPos pos, Vec3 start, Vec3 end) {
-		MovingObjectPosition result = null;
+	public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
+		RayTraceResult result = null;
 		double nearestDistance = 0;
-		IBlockState state = world.getBlockState(pos);
 		List<AxisAlignedBB> list = getGlobalCollisionBoxes(world, pos, state, null);
 		if (list != null) {
 			int n = list.size();
 			for (int i = 0; i < n; i++) {
 				AxisAlignedBB box = list.get(i);
-				MovingObjectPosition mp = box.calculateIntercept(start, end);
+				RayTraceResult mp = box.calculateIntercept(start, end);
 				if (mp != null) {
 					mp.subHit = i;
 					double d = start.squareDistanceTo(mp.hitVec);
@@ -75,39 +75,32 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 			//setBlockBounds(list.get(result.subHit));
 			int i = result.subHit;
 			boxHit = list.get(i).offset(-pos.getX(), -pos.getY(), -pos.getZ());
-			result = new MovingObjectPosition(result.hitVec, result.sideHit, pos);
+			result = new RayTraceResult(result.hitVec, result.sideHit, pos);
 			result.subHit = i;
 		}
 		return result;
 	}
 
 	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (boxHit != null) {
 			ShapeTE te = ShapeTE.get(world, pos);
-			if (te != null && te.shape.kind.highlightZones()) {
-				setBlockBounds(boxHit);
-				return;
-			}
+			if (te != null && te.shape.kind.highlightZones())
+				return boxHit;
 		}
-		IBlockState state = world.getBlockState(pos);
+//		IBlockState state = world.getBlockState(pos);
 //		List<AxisAlignedBB> list = getLocalCollisionBoxes(world, pos, state, null);
 //		if (list != null)
 //			setBlockBounds(Utils.unionOfBoxes(list));
 		AxisAlignedBB box = getLocalBounds(world, pos, state, null);
 		if (box != null)
-			setBlockBounds(box);
+			return box;
 		else
-			super.setBlockBoundsBasedOnState(world, pos);
+		return super.getBoundingBox(state, world, pos);
 	}
 	
-	public void setBlockBounds(AxisAlignedBB box) {
-		setBlockBounds((float)box.minX, (float)box.minY, (float)box.minZ,
-			(float)box.maxX, (float)box.maxY, (float)box.maxZ);
-	}
-
 	@Override
-	public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state,
+	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos,
 		AxisAlignedBB clip, List result, Entity entity)
 	{
 		List<AxisAlignedBB> list = getGlobalCollisionBoxes(world, pos, state, entity);
@@ -165,7 +158,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 	
 	@Override
-	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te) {
+	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack itemStack) {
 		//System.out.printf("ShapeBlock.harvestBlock: by %s\n", player);
 		if (te instanceof ShapeTE) {
 			ShapeTE ste = (ShapeTE)te;
@@ -181,7 +174,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 
 	@Override
-	public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null)
 			return BaseUtils.blockStackWithTileEntity(this, 1, te);
@@ -197,7 +190,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(EntityPlayer player, World world, BlockPos pos) {
+	public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
 		float result = 1.0F;
 		IBlockState base = getBaseBlockState(world, pos);
 		if (base != null) {
@@ -208,10 +201,10 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 	
 	public static float acBlockStrength(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
-		float hardness = state.getBlock().getBlockHardness(world, pos);
+		float hardness = state.getBlock().getBlockHardness(state, world, pos);
 		if (hardness < 0.0F)
 			return 0.0F;
-		float strength = player.getBreakSpeed(state, pos) / hardness;
+		float strength = player.getDigSpeed(state, pos) / hardness;
 		if (!acCanHarvestBlock(state, player))
 			return  strength / 100F;
 		else
@@ -220,16 +213,16 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 
 	public static boolean acCanHarvestBlock(IBlockState state, EntityPlayer player) {
 		Block block = state.getBlock();
-		if (block.getMaterial().isToolNotRequired())
+		if (block.getMaterial(state).isToolNotRequired())
 			return true;
 		ItemStack stack = player.inventory.getCurrentItem();
 		//state = state.getBlock().getActualState(state, world, pos);
 		String tool = block.getHarvestTool(state);
 		if (stack == null || tool == null)
-			return player.canHarvestBlock(block);
+			return player.canHarvestBlock(state);
 		int toolLevel = stack.getItem().getHarvestLevel(stack, tool);
 		if (toolLevel < 0)
-			return player.canHarvestBlock(block);
+			return player.canHarvestBlock(state);
 		else
 			return toolLevel >= block.getHarvestLevel(state);
 	}
@@ -245,7 +238,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player,
-		EnumFacing side, float hitX, float hitY, float hitZ)
+		EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
 		ItemStack stack = player.inventory.getCurrentItem();
 		if (stack != null) {
@@ -257,13 +250,13 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 	
 	@Override
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+	public boolean canRenderInLayer(BlockRenderLayer layer) {
 		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public float getAmbientOcclusionLightValue() {
+	public float getAmbientOcclusionLightValue(IBlockState state) {
 		return 0.8f;
 	}
 

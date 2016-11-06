@@ -19,6 +19,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import static gcewing.architecture.Vector3.getDirectionVec;

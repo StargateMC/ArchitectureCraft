@@ -14,6 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
 public class BaseUtils {
 

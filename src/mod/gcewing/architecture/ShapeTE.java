@@ -16,6 +16,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 //import static gcewing.architecture.BaseUtils.*;
@@ -41,7 +42,7 @@ public class ShapeTE extends BaseTileEntity {
 	public ShapeTE() {
 		super();
 		shape = Shape.RoofTile;
-		baseBlockState = Blocks.planks.getDefaultState();
+		baseBlockState = Blocks.PLANKS.getDefaultState();
 	}
 	
 	public ShapeTE(Shape s, IBlockState b) {
@@ -91,6 +92,7 @@ public class ShapeTE extends BaseTileEntity {
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
+	    //System.out.printf("ShapeTE.readFromNBT: %s\n", pos);
 		super.readFromNBT(nbt);
 		readShapeFromNBT(nbt);
 		readSecondaryMaterialFromNBT(nbt);
@@ -106,7 +108,7 @@ public class ShapeTE extends BaseTileEntity {
 		shape = Shape.forId(nbt.getInteger("Shape"));
 		baseBlockState = nbtGetBlockState(nbt, "BaseName", "BaseData");
 		if (baseBlockState == null)
-			baseBlockState = Blocks.planks.getDefaultState();
+			baseBlockState = Blocks.PLANKS.getDefaultState();
 		disabledConnections = nbt.getInteger("Disconnected");
 	}
 	
@@ -125,12 +127,13 @@ public class ShapeTE extends BaseTileEntity {
 		return null;
 	}
 		
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		writeShapeToNBT(nbt);
 		writeSecondaryMaterialToNBT(nbt);
 		if (offsetX != 0)
 			nbt.setByte("offsetX", offsetX);
+		return nbt;
 	}
 	
 	@Override	
@@ -210,7 +213,7 @@ public class ShapeTE extends BaseTileEntity {
 		markChanged();
 	}
 	
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+	public boolean canRenderInLayer(BlockRenderLayer layer) {
 		if (baseBlockState.getBlock().canRenderInLayer(layer))
 			return true;
 		if (secondaryBlockState != null)

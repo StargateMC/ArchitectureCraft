@@ -12,7 +12,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.state.*;
 import net.minecraft.client.*;
 import net.minecraft.client.renderer.texture.*;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;

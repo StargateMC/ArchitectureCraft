@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Rendering target rendering to tessellator
+//   Greg's Mod Base for 1.10 - Rendering target rendering to tessellator
 //
 //------------------------------------------------------------------------------------------------
 
@@ -16,10 +16,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.*;
-import net.minecraft.client.renderer.vertex.*;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import net.minecraftforge.client.model.*;
@@ -31,8 +31,9 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
 
     protected IBlockAccess world;
     protected BlockPos blockPos;
+    protected IBlockState blockState;
     protected Block block;
-    protected WorldRenderer tess;
+    protected VertexBuffer tess;
 //  protected float shade;
     protected float cmr = 1, cmg = 1, cmb = 1;
     protected boolean ao;
@@ -41,18 +42,19 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
     protected float vr, vg, vb, va; // Colour to be applied to next vertex
     protected int vlm1, vlm2; // Light map values to be applied to next vertex
     
-    public BaseWorldRenderTarget(IBlockAccess world, BlockPos pos, WorldRenderer tess, TextureAtlasSprite overrideIcon) {
+    public BaseWorldRenderTarget(IBlockAccess world, BlockPos pos, VertexBuffer tess, TextureAtlasSprite overrideIcon) {
         super(pos.getX(), pos.getY(), pos.getZ(), overrideIcon);
         //System.out.printf("BaseWorldRenderTarget(%s)\n", pos);
         this.world = world;
         this.blockPos = pos;
-        this.block = world.getBlockState(pos).getBlock();
+        this.blockState = world.getBlockState(pos);
+        this.block = blockState.getBlock();
         this.tess = tess;
-        ao = Minecraft.isAmbientOcclusionEnabled() && block.getLightValue() == 0;
+        ao = Minecraft.isAmbientOcclusionEnabled() && block.getLightValue(blockState) == 0;
         expandTrianglesToQuads = true;
     }
     
-    WorldRenderer getWorldRenderer() {
+    VertexBuffer getWorldRenderer() {
         return tess;
     }
 
@@ -118,7 +120,7 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
                     if (w > 0) {
                         int br;
                         try {
-                            br = block.getMixedBrightnessForBlock(world, pos);
+                            br = block.getPackedLightmapCoords(blockState, world, pos);
                         }
                         catch (RuntimeException e) {
                             System.out.printf("BaseWorldRenderTarget.aoLightVertex: getMixedBrightnessForBlock(%s) with weight %s for block at %s: %s\n",
@@ -127,7 +129,7 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
                         }
                         float lv;
                         if (!pos.equals(blockPos))
-                            lv = world.getBlockState(pos).getBlock().getAmbientOcclusionLightValue();
+                            lv = world.getBlockState(pos).getBlock().getAmbientOcclusionLightValue(blockState);
                         else
                             lv = 1.0f;
                         //System.out.printf("(%s,%s,%s) br = 0x%08x lv = %.3f w = %.3f\n",
@@ -149,7 +151,7 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
         if (wt > 0)
             brv = (iround(brSum1 / wt * 0xf0) << 16) | iround(brSum2 / wt * 0xf0);
         else
-            brv = block.getMixedBrightnessForBlock(world, blockPos);
+            brv = block.getPackedLightmapCoords(blockState, world, blockPos);
         float lvv = (float)lvSum;
         //System.out.printf("brv = 0x%08x lvv = %.3f shade = %.3f\n", brv, lvv, shade);
         setLight(shade * lvv, brv);
@@ -166,7 +168,7 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
                 (int)floor(p.z + 0.01 * n.z));
         else
             pos = blockPos;
-        int br = block.getMixedBrightnessForBlock(world, pos);
+        int br = block.getPackedLightmapCoords(blockState, world, pos);
         setLight(shade, br);
     }
 

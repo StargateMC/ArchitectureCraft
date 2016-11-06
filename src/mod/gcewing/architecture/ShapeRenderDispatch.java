@@ -15,6 +15,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 
 import net.minecraftforge.client.MinecraftForgeClient;
 
@@ -27,7 +28,7 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 
 	@Override
 	public void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target,
-		EnumWorldBlockLayer layer, Trans3 t)
+		BlockRenderLayer layer, Trans3 t)
 	{
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null) {
@@ -74,7 +75,7 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 					}
 					if (renderBase && te.shape.kind.secondaryDefaultsToBase()) {
 					    if (icon2 == null || (te.secondaryBlockState != null &&
-					        te.secondaryBlockState.getBlock().getBlockLayer() != EnumWorldBlockLayer.SOLID)) {
+					        te.secondaryBlockState.getBlock().getBlockLayer() != BlockRenderLayer.SOLID)) {
                                 textures[2] = textures[0];
                                 textures[3] = textures[1];
                                 renderSecondary = renderBase;

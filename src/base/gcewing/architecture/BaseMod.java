@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
 //
-//   Greg's Mod Base for 1.8 - Generic Mod
+//   Greg's Mod Base for 1.10 - Generic Mod
 //
 //------------------------------------------------------------------------------------------------
 
@@ -21,10 +21,10 @@ import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.network.Packet;
-import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.server.management.PlayerManager;
+import net.minecraft.server.management.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
 import net.minecraftforge.common.*;
@@ -129,7 +129,7 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
         resourceDir = "/" + resourceRelDir;
         resourceURL = getClass().getClassLoader().getResource(resourceRelDir);
         subsystems.add(this);
-        creativeTab = CreativeTabs.tabMisc;
+        creativeTab = CreativeTabs.MISC;
     }
     
     static String getModID(Class cls) {
@@ -273,6 +273,8 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
         BaseSubsystem sub = null;
         if (isModLoaded(modId)) {
             sub = newSubsystem(className);
+            sub.mod = this;
+            sub.client = client;
             subsystems.add(sub);
         }
         return sub;
@@ -433,11 +435,11 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
     
     //--------------- Dungeon loot ----------------------------------------------------------
 
-    public void addRandomChestItem(ItemStack stack, int minQty, int maxQty, int weight, String... category) {
-        WeightedRandomChestContent item = new WeightedRandomChestContent(stack, minQty, maxQty, weight);
-        for (int i = 0; i < category.length; i++)
-            ChestGenHooks.addItem(category[i], item);
-    }
+//     public void addRandomChestItem(ItemStack stack, int minQty, int maxQty, int weight, String... category) {
+//         WeightedRandomChestContent item = new WeightedRandomChestContent(stack, minQty, maxQty, weight);
+//         for (int i = 0; i < category.length; i++)
+//             ChestGenHooks.addItem(category[i], item);
+//    }
 
     //--------------- Entity registration ----------------------------------------------------------
 
@@ -469,14 +471,14 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
     
     public List<VSBinding> registeredVillagers = new ArrayList<VSBinding>();
     
-    int addVillager(String name, ResourceLocation skin) {
-        int id = config.getVillager(name);
-        VSBinding b = new VSBinding();
-        b.id = id;
-        b.object = skin;
-        registeredVillagers.add(b);
-        return id;
-    }
+//     int addVillager(String name, ResourceLocation skin) {
+//         int id = config.getVillager(name);
+//         VSBinding b = new VSBinding();
+//         b.id = id;
+//         b.object = skin;
+//         registeredVillagers.add(b);
+//         return id;
+//     }
     
 //  void addTradeHandler(int villagerID, IVillageTradeHandler handler) {
 //      VillagerRegistry.instance().registerVillageTradeHandler(villagerID, handler);
@@ -550,19 +552,19 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
     //------------------------- Network --------------------------------------------------
     
     public static void sendTileEntityUpdate(TileEntity te) {
-        Packet packet = te.getDescriptionPacket();
+        Packet packet = te.getUpdatePacket();
         if (packet != null) {
             BlockPos pos = te.getPos();
             int x = pos.getX() >> 4;
             int z = pos.getZ() >> 4;
             //System.out.printf("BaseMod.sendTileEntityUpdate: for chunk coords (%s, %s)\n", x, z);
             WorldServer world = (WorldServer)te.getWorld();
-            ServerConfigurationManager cm = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager();
-            PlayerManager pm = world.getPlayerManager();
-            for (EntityPlayerMP player : (List<EntityPlayerMP>)cm.playerEntityList)
+            PlayerList cm = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
+            PlayerChunkMap pm = world.getPlayerChunkMap();
+            for (EntityPlayerMP player : cm.getPlayerList())
                 if (pm.isPlayerWatchingChunk(player, x, z)) {
                     //System.out.printf("BaseMod.sendTileEntityUpdate: to %s\n", player);
-                    player.playerNetServerHandler.sendPacket(packet);
+                    player.connection.sendPacket(packet);
                 }
         }
     }

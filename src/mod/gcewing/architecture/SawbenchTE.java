@@ -143,11 +143,12 @@ public class SawbenchTE extends BaseTileInventory {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tc) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tc) {
 		super.writeToNBT(tc);
 		tc.setInteger("Page", selectedPage);
 		tc.setIntArray("Slots", selectedSlots);
 		tc.setBoolean("PMU", pendingMaterialUsage);
+		return tc;
 	}
 	
 //	public void setSelectedShape(int page, int slot) {

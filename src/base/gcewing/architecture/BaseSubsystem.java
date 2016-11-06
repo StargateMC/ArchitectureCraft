@@ -10,7 +10,10 @@ import net.minecraft.item.*;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.*;
 
-public class BaseSubsystem {
+public class BaseSubsystem<MOD extends BaseMod, CLIENT extends BaseModClient> {
+
+    public MOD mod;
+    public CLIENT client;
 
     public void preInit(FMLPreInitializationEvent e) {}
     public void init(FMLInitializationEvent e) {}
