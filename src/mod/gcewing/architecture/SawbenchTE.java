@@ -12,6 +12,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
+import net.minecraft.util.*;
 import net.minecraft.world.*;
 
 import net.minecraftforge.common.util.*;
@@ -83,15 +84,8 @@ public class SawbenchTE extends BaseTileInventory {
 		return inventory;
 	}
 	
-//	@Override
-//	public ItemStack getStackInSlotOnClosing(int i) {
-//		return null; // Leave items in inventory on closing
-//	}
-
 	@Override
 	public void setInventorySlotContents(int i, ItemStack stack) {
-		//System.out.printf("SawbenchTE.setInventorySlotContents: %d to %s on %s\n", i, stack, worldObj);
-		beforeChangeSlot(i);
 		super.setInventorySlotContents(i, stack);
 		updateResultSlot();
 	}
@@ -99,22 +93,18 @@ public class SawbenchTE extends BaseTileInventory {
 	@Override
 	public ItemStack decrStackSize(int slot, int amount) {
 		//System.out.printf("SawbenchTE.decrStackSize: %d by %d on %s\n", slot, amount, worldObj);
-		beforeChangeSlot(slot);
+		if (slot == resultSlot)
+		    usePendingMaterial();
 		ItemStack result = super.decrStackSize(slot, amount);
 		updateResultSlot();
 		return result;
 	}
 	
-	void beforeChangeSlot(int slot) {
-		//System.out.printf("SawbenchTE.beforeChangeSlot: %d pmu = %s\n", slot, pendingMaterialUsage);
-		if (slot == resultSlot && pendingMaterialUsage) {
-			//System.out.printf("SawbenchTE.beforeChangeSlot: setting pmu to false\n");
+	void usePendingMaterial() {
+		//System.out.printf("SawbenchTE.usePendingMaterial: pmu = %s on %s\n", pendingMaterialUsage, worldObj);
+		if (pendingMaterialUsage) {
 			pendingMaterialUsage = false;
-			ItemStack result = getStackInSlot(resultSlot);
-			if (result != null) {
-				//System.out.printf("SawbenchTE.beforeChangeSlot: using material\n");
-				inventory.decrStackSize(materialSlot, materialMultiple());
-			}
+            inventory.decrStackSize(materialSlot, materialMultiple());
 		}
 	}
 
@@ -151,18 +141,6 @@ public class SawbenchTE extends BaseTileInventory {
 		return tc;
 	}
 	
-//	public void setSelectedShape(int page, int slot) {
-//		if (page >= 0 && page < pages.length) {
-//			selectedPage = page;
-//			if (slot >= 0 && slot < pages[selectedPage].size())
-//				selectedSlots[selectedPage] = slot;
-//			else
-//				selectedSlots[selectedPage] = 0;
-//			markDirty();
-//			updateResultSlot();
-//		}
-//	}
-	
 	public void setSelectedShape(int page, int slot) {
 		if (page >= 0 && page < pages.length) {
 			selectedPage = page;
@@ -176,41 +154,36 @@ public class SawbenchTE extends BaseTileInventory {
 	}
 
 	void updateResultSlot() {
-		//System.out.printf("SawbenchTE.updateResultSlot: pmu = %s on %s\n",
-		//	pendingMaterialUsage, worldObj);
+		//System.out.printf("SawbenchTE.updateResultSlot: pmu = %s on %s\n", pendingMaterialUsage, worldObj);
 		ItemStack oldResult = getStackInSlot(resultSlot);
 		if (oldResult == null || pendingMaterialUsage) {
-			ItemStack materialStack = getStackInSlot(materialSlot);
-			ItemStack resultStack = null;
-			Shape resultShape = getSelectedShape();
-			if (resultShape != null) {
-				//System.out.printf("SawbenchTE.updateResultSlot: material = %s\n", materialStack);
-				//System.out.printf("SawbenchTE.updateResultSlot: old result = %s\n", resultStack);
-				if (materialStack != null && materialStack.stackSize >= resultShape.materialUsed) {
-					Item materialItem = materialStack.getItem();
-					if (materialItem instanceof ItemBlock) {
-						Block materialBlock = Block.getBlockFromItem(materialItem);
-						//System.out.printf("SawbenchTE.updateResultSlot: material block id = %d\n",
-						//	materialBlock.blockID);
-						//if (materialBlock.isOpaqueCube()) {
-						if (!materialBlock.hasTileEntity()) {
-							resultStack = resultShape.kind.newStack(resultShape, materialBlock,
-								materialStack.getItemDamage(), resultShape.itemsProduced);
-						}
-					}
-				}
-			}
-			if (!ItemStack.areItemStacksEqual(resultStack, oldResult)) {
-				//System.out.printf("SawbenchTE.updateResultSlot: setting result to %s on %s\n",
-				//	resultStack, worldObj);
+			ItemStack resultStack = makeResultStack();
+			if (!ItemStack.areItemStacksEqual(resultStack, oldResult))
 				inventory.setInventorySlotContents(resultSlot, resultStack);
-			}
 			pendingMaterialUsage = resultStack != null;
-			//System.out.printf("SawbenchTE.updateResultSlot: now pmu = %s on %s\n",
-			//	pendingMaterialUsage, worldObj);
+			//System.out.printf("SawbenchTE.updateResultSlot: now pmu = %s on %s\n", pendingMaterialUsage, worldObj);
 		}
 	}
 	
+	protected ItemStack makeResultStack() {
+        Shape resultShape = getSelectedShape();
+        if (resultShape != null) {
+			ItemStack materialStack = getStackInSlot(materialSlot);
+            if (materialStack != null && materialStack.stackSize >= resultShape.materialUsed) {
+                Item materialItem = materialStack.getItem();
+                if (materialItem instanceof ItemBlock) {
+                    Block materialBlock = Block.getBlockFromItem(materialItem);
+                    //if (materialBlock.isOpaqueCube()) {
+                    if (!materialBlock.hasTileEntity()) {
+                        return resultShape.kind.newStack(resultShape, materialBlock,
+                            materialStack.getItemDamage(), resultShape.itemsProduced);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 	int materialMultiple() {
 		//return materialUsedForShape[selectedShape];
 		Shape shape = getSelectedShape();
@@ -227,4 +200,13 @@ public class SawbenchTE extends BaseTileInventory {
 		return 0;
 	}
 	
+    /**
+     * Returns true if automation can insert the given item in the given slot from the given side. Args: Slot, item,
+     * side
+     */
+    @Override
+    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
+        return slot == materialSlot;
+    }
+
 }
