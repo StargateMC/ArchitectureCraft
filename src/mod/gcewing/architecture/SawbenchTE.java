@@ -8,6 +8,7 @@ package gcewing.architecture;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.player.*;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
@@ -173,8 +174,7 @@ public class SawbenchTE extends BaseTileInventory {
                 Item materialItem = materialStack.getItem();
                 if (materialItem instanceof ItemBlock) {
                     Block materialBlock = Block.getBlockFromItem(materialItem);
-                    //if (materialBlock.isOpaqueCube()) {
-                    if (!materialBlock.hasTileEntity()) {
+                    if (isAcceptableMaterial(materialBlock)) {
                         return resultShape.kind.newStack(resultShape, materialBlock,
                             materialStack.getItemDamage(), resultShape.itemsProduced);
                     }
@@ -182,6 +182,12 @@ public class SawbenchTE extends BaseTileInventory {
             }
         }
         return null;
+    }
+    
+    protected boolean isAcceptableMaterial(Block block) {
+        if (block == Blocks.GLASS || block == Blocks.STAINED_GLASS)
+            return true;
+        return block.getDefaultState().isFullCube() && !block.hasTileEntity();
     }
 
 	int materialMultiple() {
