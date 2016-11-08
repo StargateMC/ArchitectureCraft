@@ -48,7 +48,7 @@ public abstract class ShapeKind {
 	
 	public ItemStack newStack(Shape shape, Block materialBlock, int materialMeta, int stackSize) {
 		ShapeTE te = new ShapeTE(shape, materialBlock, materialMeta);
-		return BaseUtils.blockStackWithTileEntity(ArchitectureCraft.blockShape, stackSize, te);
+		return BaseTileEntity.blockStackWithTileEntity(ArchitectureCraft.blockShape, stackSize, te);
 	}
 	
 	public boolean orientOnPlacement(EntityPlayer player, ShapeTE te,
@@ -531,7 +531,7 @@ public abstract class ShapeKind {
 
 		@Override
 		protected ItemStack newSecondaryMaterialStack(IBlockState state) {
-			return BaseUtils.blockStackWithState(state, 1);
+			return BaseBlockUtils.blockStackWithState(state, 1);
 		}
 		
 		@Override

@@ -162,7 +162,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 		//System.out.printf("ShapeBlock.harvestBlock: by %s\n", player);
 		if (te instanceof ShapeTE) {
 			ShapeTE ste = (ShapeTE)te;
-			ItemStack stack = BaseUtils.blockStackWithTileEntity(this, 1, ste);
+			ItemStack stack = BaseTileEntity.blockStackWithTileEntity(this, 1, ste);
 			//System.out.printf("ShapeBlock.harvestBlock: spawning %s\n", stack);
 			spawnAsEntity(world, pos, stack);
 			if (ste.secondaryBlockState != null) {
@@ -177,7 +177,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null)
-			return BaseUtils.blockStackWithTileEntity(this, 1, te);
+			return te.newItemStack(1);
 		else
 			return null;
 	}

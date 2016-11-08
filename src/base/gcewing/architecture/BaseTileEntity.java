@@ -172,4 +172,18 @@ public class BaseTileEntity extends TileEntity
         }
     }
  
+    public static ItemStack blockStackWithTileEntity(Block block, int size, BaseTileEntity te) {
+        ItemStack stack = new ItemStack(block, size);
+        if (te != null) {
+            NBTTagCompound tag = new NBTTagCompound();
+            te.writeToItemStackNBT(tag);
+            stack.setTagCompound(tag);
+        }
+        return stack;
+    }
+    
+    public ItemStack newItemStack(int size) {
+        return blockStackWithTileEntity(getBlockType(), size, this);
+    }
+
 }

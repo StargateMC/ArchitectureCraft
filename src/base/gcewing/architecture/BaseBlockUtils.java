@@ -6,6 +6,8 @@
 
 package gcewing.architecture;
 
+import java.io.*;
+
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.*;
@@ -106,4 +108,33 @@ public class BaseBlockUtils {
         return block.canRenderInLayer(layer);
     }
     
+    public static ItemStack blockStackWithState(IBlockState state, int size) {
+        Block block = state.getBlock();
+        int meta = block.getMetaFromState(state);
+        return new ItemStack(block, size, meta);
+    }
+    
+    public static BlockPos readBlockPos(DataInput data) {
+        try {
+            int x = data.readInt();
+            int y = data.readInt();
+            int z = data.readInt();
+            return new BlockPos(x, y, z);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static void writeBlockPos(DataOutput data, BlockPos pos) {
+        try {
+            data.writeInt(pos.getX());
+            data.writeInt(pos.getY());
+            data.writeInt(pos.getZ());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -61,7 +61,7 @@ public class ChiselItem extends Item {
 	}
 
 	void dropBlockAsItem(World world, BlockPos pos, IBlockState state) {
-		ItemStack stack = BaseUtils.blockStackWithState(state, 1);
+		ItemStack stack = BaseBlockUtils.blockStackWithState(state, 1);
 		Block.spawnAsEntity(world, pos, stack);
 	}
 
