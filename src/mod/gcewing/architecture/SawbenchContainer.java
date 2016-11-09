@@ -27,6 +27,7 @@ public class SawbenchContainer extends BaseContainer {
 	public static int outputSlotTop = 57;
 
 	SawbenchTE te;
+	SlotRange sawbenchSlotRange;
 	
 	public static Container create(EntityPlayer player, World world, BlockPos pos) {
 		TileEntity te = world.getTileEntity(pos);
@@ -39,8 +40,10 @@ public class SawbenchContainer extends BaseContainer {
 	public SawbenchContainer(EntityPlayer player, SawbenchTE te) {
 		super(guWidth, guiHeight);
 		this.te = te;
+		sawbenchSlotRange = new SlotRange();
 		addSlotToContainer(new Slot(te, 0, inputSlotLeft, inputSlotTop));
 		addSlotToContainer(new SlotSawbenchResult(te, 1, outputSlotLeft, outputSlotTop));
+		sawbenchSlotRange.end();
 		addPlayerSlots(player, 8, guiHeight - 81);
 	}
 	
@@ -49,15 +52,13 @@ public class SawbenchContainer extends BaseContainer {
 		return this.te.isUseableByPlayer(player);
 	}
 
-//	/**
-//	 * Called to transfer a stack from one inventory to the other eg. when shift clicking.
-//	 */
-//	 
-//	@Override
-//	public ItemStack transferStackInSlot(EntityPlayer player, int par1) {
-//		// TODO
-//		return null;
-//	}
+	@Override
+	protected SlotRange transferSlotRange(int srcSlotIndex, ItemStack stack) {
+	    if (playerSlotRange.contains(srcSlotIndex))
+	        return sawbenchSlotRange;
+	    else
+	        return playerSlotRange;
+	}
 	
 	//
 	//   Server
