@@ -84,17 +84,8 @@ public class SawbenchContainer extends BaseContainer {
 				}
 			}
 		}
-//		for (Object crafter : crafters)
-//			sendStateTo((ICrafting)crafter);
 	}
 
-//	void sendStateTo(ICrafting crafter) {
-//		//System.out.printf("SawbenchContainer.sendStateTo: %s; selectedShape = %d\n", crafter, te.selectedShape);
-//		crafter.sendProgressBarUpdate(this, 0, te.selectedPage);
-//		crafter.sendProgressBarUpdate(this, 1, te.selectedSlots[selectedPage]);
-//		crafter.sendProgressBarUpdate(this, 2, te.pendingMaterialUsage ? 1 : 0);
-//	}
-	
 	@ServerMessageHandler("SelectShape")
 	public void onSelectShape(EntityPlayer player, ChannelInput data) {
 		int page = data.readInt();
