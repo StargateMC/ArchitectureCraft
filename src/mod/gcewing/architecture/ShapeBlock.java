@@ -172,21 +172,21 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	}
 	
 	@Override
-	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack itemStack) {
-		//System.out.printf("ShapeBlock.harvestBlock: by %s\n", player);
+	protected List<ItemStack> getDropsFromTileEntity(IBlockAccess world, BlockPos pos, IBlockState state, TileEntity te, int fortune) {
+        //System.out.printf("ShapeBlock.getDropsFromTileEntity: %s with fortune %s\n", te, fortune);
+	    List<ItemStack> result = new ArrayList<ItemStack>();
 		if (te instanceof ShapeTE) {
 			ShapeTE ste = (ShapeTE)te;
 			ItemStack stack = BaseTileEntity.blockStackWithTileEntity(this, 1, ste);
-			//System.out.printf("ShapeBlock.harvestBlock: spawning %s\n", stack);
-			spawnAsEntity(world, pos, stack);
+			result.add(stack);
 			if (ste.secondaryBlockState != null) {
 				stack = ste.shape.kind.newSecondaryMaterialStack(ste.secondaryBlockState);
-				//System.out.printf("ShapeBlock.harvestBlock: spawning %s\n", stack);
-				spawnAsEntity(world, pos, stack);
+				result.add(stack);
 			}
 		}
+		return result;
 	}
-
+	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		ShapeTE te = ShapeTE.get(world, pos);
