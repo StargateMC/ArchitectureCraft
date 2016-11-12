@@ -476,9 +476,9 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
 
     //--------------- Villager registration -------------------------------------------------
     
-    static class VSBinding extends IDBinding<ResourceLocation> {};
-    
-    public List<VSBinding> registeredVillagers = new ArrayList<VSBinding>();
+//     static class VSBinding extends IDBinding<ResourceLocation> {};
+//     
+//     public List<VSBinding> registeredVillagers = new ArrayList<VSBinding>();
     
 //     int addVillager(String name, ResourceLocation skin) {
 //         int id = config.getVillager(name);
@@ -750,39 +750,41 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
     static Field lootPoolsField = BaseReflectionUtils.getFieldDef(LootTable.class, "pools", "field_186466_c");
     static Field lootNameField = BaseReflectionUtils.getFieldDef(LootPool.class, "name", "");
     
-//     @SubscribeEvent
-//     public void onLootTableLoad(LootTableLoadEvent event) {
-//         if (debugLoot)
-//             System.out.printf("BaseMod.onLootTableLoad\n");
-//         ResourceLocation locn = event.getName();
-//         if (locn.getResourceDomain().equals("minecraft")) {
-//             String path = String.format("/assets/{}/loot_tables/{}.json", assetKey, locn.getResourcePath());
-//             URL url = getClass().getResource(path);
-//             if (debugLoot)
-//                 System.out.printf("BaseMod.onLootTableLoad: Looking for %s\n", url);
-//             String data;
-//             try {
-//                 data = Resources.toString(url, Charsets.UTF_8);
-//             }
-//             catch (Exception e) {
-//                 if (debugLoot)
-//                     System.out.printf("onLootTableLoad: %s\n", e);
-//                 return;
-//             }
-//             if (debugLoot)
-//                 System.out.printf("BaseMod.onLootTableLoad: data = %s\n", data);
-//             Gson gson = (Gson)BaseReflectionUtils.getField(null, lootGsonField);
-//             LootTable table = event.getTable();
-//             LootTable newTable = ForgeHooks.loadLootTable(gson, locn, data, true);
-//             List<LootPool> newPools = (List<LootPool>)BaseReflectionUtils.getField(newTable, lootPoolsField);
-//             int i = 0;
-//             for (LootPool pool : newPools) {
-//                 BaseReflectionUtils.setField(pool, lootNameField, modID + (i++));
-//                 if (debugLoot)
-//                     System.out.printf("BaseMod.onLootTableLoad: Adding pool %s\n", pool.getName());
-//                 table.addPool(pool);
-//             }
-//         }
-//     }
+    @SubscribeEvent
+    public void onLootTableLoad(LootTableLoadEvent event) {
+        //if (debugLoot)
+        //    System.out.printf("BaseMod.onLootTableLoad\n");
+        ResourceLocation locn = event.getName();
+        if (locn.getResourceDomain().equals("minecraft")) {
+            String path = String.format("/assets/%s/loot_tables/%s.json", assetKey, locn.getResourcePath());
+            //if (debugLoot)
+            //    System.out.printf("BaseMod.onLootTableLoad: Looking for %s\n", path);
+            URL url = getClass().getResource(path);
+            if (url != null) {
+                if (debugLoot)
+                    System.out.printf("BaseMod.onLootTableLoad: Loading %s\n", path);
+                String data;
+                try {
+                    data = Resources.toString(url, Charsets.UTF_8);
+                }
+                catch (Exception e) {
+                    throw new RuntimeException("Error loading " + path + ": " + e);
+                }
+                //if (debugLoot)
+                //    System.out.printf("BaseMod.onLootTableLoad: data = %s\n", data);
+                Gson gson = (Gson)BaseReflectionUtils.getField(null, lootGsonField);
+                LootTable table = event.getTable();
+                LootTable newTable = ForgeHooks.loadLootTable(gson, locn, data, true);
+                List<LootPool> newPools = (List<LootPool>)BaseReflectionUtils.getField(newTable, lootPoolsField);
+                int i = 0;
+                for (LootPool pool : newPools) {
+                    BaseReflectionUtils.setField(pool, lootNameField, modID + (i++));
+                    if (debugLoot)
+                        System.out.printf("BaseMod.onLootTableLoad: Adding pool %s\n", pool.getName());
+                    table.addPool(pool);
+                }
+            }
+        }
+    }
 
 }
