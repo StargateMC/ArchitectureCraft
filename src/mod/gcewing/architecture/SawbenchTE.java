@@ -27,14 +27,8 @@ public class SawbenchTE extends BaseTileInventory {
 	final public static int[] materialSideSlots = {materialSlot};
 	final public static int[] resultSideSlots = {resultSlot};
 	
-//	static int[] materialUsedForShape = new int[] {
-//		1, 1, 2,  1, 1, 1,  1, 1, 1
-//	};
-//	
-//	static int[] productMadeForShape = new int[] {
-//		2, 3, 3,  4, 3, 1,  1, 0, 0
-//	};
-
+	public static boolean allowAutomation = false;
+	
 	public static ShapePage[] pages = {
 		new ShapePage("Roofing",
 			RoofTile, RoofOuterCorner, RoofInnerCorner,
@@ -101,12 +95,39 @@ public class SawbenchTE extends BaseTileInventory {
 		return result;
 	}
 	
-	void usePendingMaterial() {
+	public ItemStack usePendingMaterial() {
 		//System.out.printf("SawbenchTE.usePendingMaterial: pmu = %s on %s\n", pendingMaterialUsage, worldObj);
+        ItemStack origMaterialStack = getStackInSlot(materialSlot);
 		if (pendingMaterialUsage) {
 			pendingMaterialUsage = false;
             inventory.decrStackSize(materialSlot, materialMultiple());
 		}
+		return origMaterialStack;
+	}
+	
+	public void returnUnusedMaterial(ItemStack origMaterialStack) {
+	    //if (!worldObj.isRemote)
+	    //    System.out.printf("SawbenchTE.returnUnusedMaterial: before: pmu = %s, material = %s, result = %s\n",
+	    //        pendingMaterialUsage, getStackInSlot(materialSlot), getStackInSlot(resultSlot));
+	    if (!pendingMaterialUsage) {
+	        ItemStack materialStack = getStackInSlot(materialSlot);
+	        ItemStack resultStack = getStackInSlot(resultSlot);
+	        int m = materialMultiple();
+	        int n = resultMultiple();
+	        if (resultStack != null && resultStack.stackSize == n) {
+	            if (materialStack != null)
+	                materialStack.stackSize += m;
+	            else {
+	                materialStack = origMaterialStack;
+	                materialStack.stackSize = m;
+	            }
+	            inventory.setInventorySlotContents(materialSlot, materialStack);
+	            pendingMaterialUsage = true;
+	        }
+	    }
+	    //if (!worldObj.isRemote)
+	    //    System.out.printf("SawbenchTE.returnUnusedMaterial: after: pmu = %s, material = %s, result = %s\n",
+	    //        pendingMaterialUsage, getStackInSlot(materialSlot), getStackInSlot(resultSlot));
 	}
 
 	/**
@@ -215,4 +236,17 @@ public class SawbenchTE extends BaseTileInventory {
         return slot == materialSlot;
     }
 
+    /**
+     * Returns true if automation can extract the given item in the given slot from the given side. Args: Slot, item,
+     * side
+     */
+    @Override
+    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
+        if (side == EnumFacing.DOWN)
+            return allowAutomation && slot == resultSlot;
+        else
+            return slot == materialSlot;
+    }
+
 }
+

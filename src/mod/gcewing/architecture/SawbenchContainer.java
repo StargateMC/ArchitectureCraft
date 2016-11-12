@@ -28,6 +28,7 @@ public class SawbenchContainer extends BaseContainer {
 
 	SawbenchTE te;
 	SlotRange sawbenchSlotRange;
+	Slot materialSlot, resultSlot;
 	
 	public static Container create(EntityPlayer player, World world, BlockPos pos) {
 		TileEntity te = world.getTileEntity(pos);
@@ -41,8 +42,8 @@ public class SawbenchContainer extends BaseContainer {
 		super(guWidth, guiHeight);
 		this.te = te;
 		sawbenchSlotRange = new SlotRange();
-		addSlotToContainer(new Slot(te, 0, inputSlotLeft, inputSlotTop));
-		addSlotToContainer(new SlotSawbenchResult(te, 1, outputSlotLeft, outputSlotTop));
+		materialSlot = addSlotToContainer(new Slot(te, 0, inputSlotLeft, inputSlotTop));
+		resultSlot = addSlotToContainer(new SlotSawbenchResult(te, 1, outputSlotLeft, outputSlotTop));
 		sawbenchSlotRange.end();
 		addPlayerSlots(player, 8, guiHeight - 81);
 	}
@@ -108,6 +109,33 @@ public class SawbenchContainer extends BaseContainer {
 		else
 			super.putStackInSlot(i, stack);
 	}
+
+    // Default transferStackInSlot does not invoke decrStackSize, so we need this
+    // to get pending material used.
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        Slot slot = getSlot(index);
+        if (slot == resultSlot)
+            return transferStackInResultSlot(player, index);
+        else
+            return super.transferStackInSlot(player, index);
+    }
+    
+    protected ItemStack transferStackInResultSlot(EntityPlayer player, int index) {
+        //if (!te.getWorld().isRemote)
+        //    System.out.printf("SawbenchContainer.transferStackInSlot: %s material %s result %s\n",
+        //        index, te.getStackInSlot(te.materialSlot), te.getStackInSlot(te.resultSlot));
+        boolean materialWasPending = te.pendingMaterialUsage;
+        ItemStack origMaterialStack = te.usePendingMaterial();
+        ItemStack result = super.transferStackInSlot(player, index);
+        //if (!te.getWorld().isRemote)
+        //    System.out.printf(
+        //        "SawbenchContainer.transferStackInSlot: returning %s material %s result %s\n",
+        //        result, te.getStackInSlot(te.materialSlot), te.getStackInSlot(te.resultSlot));
+        if (materialWasPending)
+            te.returnUnusedMaterial(origMaterialStack);
+        return result;
+    }
 
 //	@Override
 //	public void updateProgressBar(int i, int value) {
