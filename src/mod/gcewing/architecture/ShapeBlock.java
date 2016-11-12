@@ -10,6 +10,7 @@ import java.util.*;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
+import net.minecraft.block.properties.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.entity.*;
@@ -31,10 +32,23 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 
 	protected AxisAlignedBB boxHit;
 
+    public static IProperty<Integer> LIGHT = PropertyInteger.create("light", 0, 15);
+
 	public ShapeBlock() {
 		super(Material.ROCK, ShapeTE.class);
 		//renderID = -1;
 	}
+	
+	@Override
+    protected void defineProperties() {
+        super.defineProperties();
+        addProperty(LIGHT);
+    }
+
+	@Override
+    public int getNumSubtypes() {
+        return 16;
+    }
 	
 	@Override
 	public IOrientationHandler getOrientationHandler() {
@@ -259,5 +273,10 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	public float getAmbientOcclusionLightValue(IBlockState state) {
 		return 0.8f;
 	}
+
+	@Override
+    public int getLightValue(IBlockState state) {
+        return state.getValue(LIGHT);
+    }
 
 }

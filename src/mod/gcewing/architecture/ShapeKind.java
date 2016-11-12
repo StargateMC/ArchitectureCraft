@@ -48,7 +48,8 @@ public abstract class ShapeKind {
 	
 	public ItemStack newStack(Shape shape, Block materialBlock, int materialMeta, int stackSize) {
 		ShapeTE te = new ShapeTE(shape, materialBlock, materialMeta);
-		return BaseTileEntity.blockStackWithTileEntity(ArchitectureCraft.blockShape, stackSize, te);
+		int light = te.baseBlockState.getLightValue();
+		return BaseTileEntity.blockStackWithTileEntity(ArchitectureCraft.blockShape, stackSize, light, te);
 	}
 	
 	public boolean orientOnPlacement(EntityPlayer player, ShapeTE te,
