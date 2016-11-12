@@ -11,8 +11,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
+
+import net.minecraftforge.common.DimensionManager;
 
 public class BaseUtils {
 
@@ -70,6 +73,10 @@ public class BaseUtils {
             case NORTH: return 3;
             default: return 0;
         }
+    }
+    
+    public static MinecraftServer getMinecraftServer() {
+        return DimensionManager.getWorld(0).getMinecraftServer();
     }
     
 }

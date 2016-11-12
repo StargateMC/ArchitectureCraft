@@ -213,9 +213,7 @@ public class BaseRenderingManager<MOD extends BaseMod<? extends BaseModClient>> 
     }
     
     protected void registerModelLocationForSubtypes(Item item, ModelResourceLocation location) {
-        int numVariants = 1;
-        if (item.getHasSubtypes())
-            numVariants = getNumItemSubtypes(item);
+        int numVariants = getNumItemSubtypes(item);
         if (debugModelRegistration)
             System.out.printf("BaseModClient: Registering model location %s for %d subtypes of %s\n",
                 location, numVariants, item.getUnlocalizedName());
@@ -292,6 +290,14 @@ public class BaseRenderingManager<MOD extends BaseMod<? extends BaseModClient>> 
         return rend;
     }
     
+    public static void renderBlockUsingModelSpec(BaseModClient client,
+        IBlockAccess world, BlockPos pos, IBlockState state,
+        IRenderTarget target, BlockRenderLayer layer, Trans3 t)
+    {
+        ((BaseRenderingManager)client.renderingManager).renderBlockUsingModelSpec(
+            world, pos, state, target, layer, t);
+    }
+
     public void renderBlockUsingModelSpec(IBlockAccess world, BlockPos pos, IBlockState state,
         IRenderTarget target, BlockRenderLayer layer, Trans3 t)
     {
@@ -301,6 +307,13 @@ public class BaseRenderingManager<MOD extends BaseMod<? extends BaseModClient>> 
     }
     
     // Call this from renderItemStack of an ICustomRenderer to fall back to model spec
+    public static void renderItemStackUsingModelSpec(BaseModClient client,
+        ItemStack stack, IRenderTarget target, Trans3 t)
+    {
+        ((BaseRenderingManager)client.renderingManager).renderItemStackUsingModelSpec(
+            stack, target, t);
+    }
+
     public void renderItemStackUsingModelSpec(ItemStack stack, IRenderTarget target, Trans3 t) {
         IBlockState state = BaseBlockUtils.getBlockStateFromItemStack(stack);
         IBlock block = (IBlock)state.getBlock();
@@ -467,6 +480,13 @@ public class BaseRenderingManager<MOD extends BaseMod<? extends BaseModClient>> 
             return block.getActualState(state, world, pos);
     }
     
+    public static boolean renderAlternateBlock(BaseModClient client,
+        IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target)
+    {
+        return ((BaseRenderingManager)client.renderingManager).renderAlternateBlock(
+            world, pos, state, target);
+    }
+
     public boolean renderAlternateBlock(IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target)
     {
         Block block = state.getBlock();

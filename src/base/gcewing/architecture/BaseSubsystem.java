@@ -26,7 +26,6 @@ public class BaseSubsystem<MOD extends BaseMod, CLIENT extends BaseModClient> {
     protected void registerOres() {}
     protected void registerRecipes() {}
     protected void registerTileEntities() {}
-    protected void registerRandomItems() {}
     protected void registerWorldGenerators() {}
     protected void registerContainers() {}
     protected void registerEntities() {}

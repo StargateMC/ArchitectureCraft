@@ -100,11 +100,7 @@ public class BaseTileEntity extends TileEntity
     }
     
     public void markBlockForUpdate() {
-        worldObj.markBlockRangeForRenderUpdate(pos, pos);
-        if (!worldObj.isRemote) {
-            IBlockState state = worldObj.getBlockState(pos);
-            worldObj.notifyBlockUpdate(pos, state, state, 3);
-        }
+        BaseBlockUtils.markBlockForUpdate(worldObj, pos);
     }
     
     public void playSoundEffect(SoundEvent name, float volume, float pitch) {
@@ -173,7 +169,11 @@ public class BaseTileEntity extends TileEntity
     }
  
     public static ItemStack blockStackWithTileEntity(Block block, int size, BaseTileEntity te) {
-        ItemStack stack = new ItemStack(block, size);
+        return blockStackWithTileEntity(block, size, 0, te);
+    }
+
+    public static ItemStack blockStackWithTileEntity(Block block, int size, int meta, BaseTileEntity te) {
+        ItemStack stack = new ItemStack(block, size, meta);
         if (te != null) {
             NBTTagCompound tag = new NBTTagCompound();
             te.writeToItemStackNBT(tag);

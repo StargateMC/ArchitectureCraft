@@ -136,5 +136,13 @@ public class BaseBlockUtils {
             throw new RuntimeException(e);
         }
     }
+    
+    public static void markBlockForUpdate(World world, BlockPos pos) {
+        world.markBlockRangeForRenderUpdate(pos, pos);
+        if (!world.isRemote) {
+            IBlockState state = world.getBlockState(pos);
+            world.notifyBlockUpdate(pos, state, state, 3);
+        }
+    }
 
 }

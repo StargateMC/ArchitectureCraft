@@ -34,7 +34,6 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
     protected IBlockState blockState;
     protected Block block;
     protected VertexBuffer tess;
-//  protected float shade;
     protected float cmr = 1, cmg = 1, cmb = 1;
     protected boolean ao;
     protected boolean axisAlignedNormal;
@@ -69,9 +68,9 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
     }
     
     protected void rawAddVertex(Vector3 p, double u, double v) {
-//      System.out.printf("BaseWorldRenderer.rawAddVertex: %s (%.3f, %.3f, %.3f) uv (%.5f, %.5f) at %s\n",
-//          vertexCount, p.x, p.y, p.z, u, v, tess.getCurrentOffset());
         lightVertex(p);
+        //System.out.printf("BaseWorldRenderer.rawAddVertex: %s (%.3f, %.3f, %.3f) rgba (%.3f, %.3f, %.3f, %.3f) uv (%.5f, %.5f) lm (%s, %s)\n",
+        //    vertexCount, p.x, p.y, p.z, vr, vg, vb, va, u, v, vlm1, vlm2); // tess.getCurrentOffset());
         tess.pos(p.x, p.y, p.z);
         tess.color(vr, vg, vb, va);
         tess.tex(u, v);
@@ -128,12 +127,13 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
                             throw e;
                         }
                         float lv;
-                        if (!pos.equals(blockPos))
-                            lv = world.getBlockState(pos).getBlock().getAmbientOcclusionLightValue(blockState);
+                        if (!pos.equals(blockPos)) {
+                            IBlockState state = world.getBlockState(pos);
+                            lv = state.getBlock().getAmbientOcclusionLightValue(state);
+                        }
                         else
                             lv = 1.0f;
-                        //System.out.printf("(%s,%s,%s) br = 0x%08x lv = %.3f w = %.3f\n",
-                        //  X, Y, Z, br, lv, w);
+                        //System.out.printf("BaseWorldRenderTarget.aoLightVertex: (%s,%s,%s) br = 0x%08x lv = %.3f w = %.3f\n", X, Y, Z, br, lv, w);
                         if (br != 0) {
                             double br1 = ((br >> 16) & 0xff) / 240.0;
                             double br2 = (br & 0xff) / 240.0;
@@ -153,7 +153,7 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
         else
             brv = block.getPackedLightmapCoords(blockState, world, blockPos);
         float lvv = (float)lvSum;
-        //System.out.printf("brv = 0x%08x lvv = %.3f shade = %.3f\n", brv, lvv, shade);
+        //System.out.printf("BaseWorldRenderTarget.aoLightVertex: brv = 0x%08x lvv = %.3f shade = %.3f\n", brv, lvv, shade);
         setLight(shade * lvv, brv);
     }
 
@@ -173,14 +173,14 @@ public class BaseWorldRenderTarget extends BaseRenderTarget {
     }
 
     protected void setLight(float shadow, int br) {
+        //System.out.printf("BaseWorldRenderTarget.setLight: shadow %.3f br %08x cmr (%.3f, %.3f, %.3f) rgba (%.3f, %.3f, %.3f, %.3f)\n",
+        //    shadow, br, cmr, cmg, cmb, r(), g(), b(), a());
         vr = shadow * cmr * r();
         vg = shadow * cmg * g();
         vb = shadow * cmb * b();
         va = a();
         vlm1 = br >> 16;
         vlm2 = br & 0xffff;
-//      System.out.printf("BaseWorldRenderTarget.setLight: (%.3f, %.3f, %.3f, %.3f) (%s, %s)\n",
-//          vr, vg, vb, va, vlm1, vlm2);
     }
 
     public boolean end() {
