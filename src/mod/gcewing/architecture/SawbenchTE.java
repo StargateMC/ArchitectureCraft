@@ -206,16 +206,22 @@ public class SawbenchTE extends BaseTileInventory {
     }
     
     protected boolean isAcceptableMaterial(Block block) {
-        if (block == Blocks.GLASS || block == Blocks.STAINED_GLASS)
+        if (block == Blocks.GLASS || block == Blocks.STAINED_GLASS || block instanceof BlockSlab)
             return true;
         return block.getDefaultState().isFullCube() && !block.hasTileEntity();
     }
 
 	int materialMultiple() {
-		//return materialUsedForShape[selectedShape];
+		int factor = 1;
+		ItemStack materialStack = getStackInSlot(materialSlot);
+		if (materialStack != null) {
+		    Block materialBlock = Block.getBlockFromItem(materialStack.getItem());
+		    if (materialBlock instanceof BlockSlab)
+		        factor = 2;
+		}
 		Shape shape = getSelectedShape();
 		if (shape != null)
-			return shape.materialUsed;
+			return factor * shape.materialUsed;
 		return 0;
 	}
 	
