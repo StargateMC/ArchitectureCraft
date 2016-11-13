@@ -177,7 +177,7 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	    List<ItemStack> result = new ArrayList<ItemStack>();
 		if (te instanceof ShapeTE) {
 			ShapeTE ste = (ShapeTE)te;
-			ItemStack stack = BaseTileEntity.blockStackWithTileEntity(this, 1, ste);
+            ItemStack stack = ste.shape.kind.newStack(ste.shape, ste.baseBlockState, 1);
 			result.add(stack);
 			if (ste.secondaryBlockState != null) {
 				stack = ste.shape.kind.newSecondaryMaterialStack(ste.secondaryBlockState);

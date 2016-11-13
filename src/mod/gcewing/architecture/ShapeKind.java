@@ -46,10 +46,14 @@ public abstract class ShapeKind {
 		ITexture[] textures, IRenderTarget target, Trans3 t,
 		boolean renderBase, boolean renderSecondary);
 	
-	public ItemStack newStack(Shape shape, Block materialBlock, int materialMeta, int stackSize) {
-		ShapeTE te = new ShapeTE(shape, materialBlock, materialMeta);
+	public ItemStack newStack(Shape shape, IBlockState materialState, int stackSize) {
+		ShapeTE te = new ShapeTE(shape, materialState);
 		int light = te.baseBlockState.getLightValue();
 		return BaseTileEntity.blockStackWithTileEntity(ArchitectureCraft.blockShape, stackSize, light, te);
+	}
+
+	public ItemStack newStack(Shape shape, Block materialBlock, int materialMeta, int stackSize) {
+		return newStack(shape, materialBlock.getStateFromMeta(materialMeta), stackSize);
 	}
 	
 	public boolean orientOnPlacement(EntityPlayer player, ShapeTE te,
