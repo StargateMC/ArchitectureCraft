@@ -101,6 +101,7 @@ public class ArchitectureCraft extends BaseMod<ArchitectureCraftClient> {
 	}
 
 	protected void registerRecipes() {
+	    ItemStack orangeDye = new ItemStack(Items.dye, 1, EnumDyeColor.ORANGE.getDyeDamage());
 		newRecipe(blockSawbench, 1,
 			"I*I",
 			"/0/",
@@ -118,14 +119,14 @@ public class ArchitectureCraft extends BaseMod<ArchitectureCraftClient> {
 			" W ",
 			'W', Blocks.planks, '/', Items.stick);
 		newRecipe(itemChisel, 1,
-			"I",
-			"s",
-			'I', Items.iron_ingot, 's', Items.stick);
+			"I ",
+			"ds",
+			'I', Items.iron_ingot, 's', Items.stick, 'd', orangeDye);
 		newRecipe(itemHammer, 1,
 			"II ",
-			" sI",
-			" s ",
-			'I', Items.iron_ingot, 's', Items.stick);
+			"dsI",
+			"ds ",
+			'I', Items.iron_ingot, 's', Items.stick, 'd', orangeDye);
 }
 	
 	//--------------- GUIs ----------------------------------------------------------

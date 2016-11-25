@@ -269,16 +269,29 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
 
     //--------------- Third-party mod integration ------------------------------------------------
 
-    public BaseSubsystem integrateWith(String modId, String className) {
-        BaseSubsystem sub = null;
-        if (isModLoaded(modId)) {
-            sub = newSubsystem(className);
-            subsystems.add(sub);
-        }
+    public BaseSubsystem integrateWithMod(String modId, String subsystemClassName) {
+        if (isModLoaded(modId))
+            return loadSubsystem(subsystemClassName);
+        else
+            return null;
+    }
+    
+    public BaseSubsystem integrateWithClass(String className, String subsystemClassName) {
+        if (classAvailable(className))
+            return loadSubsystem(subsystemClassName);
+        else
+            return null;
+    }
+
+    public BaseSubsystem loadSubsystem(String className) {
+        BaseSubsystem sub = newSubsystem(className);
+        sub.mod = this;
+        sub.client = client;
+        subsystems.add(sub);
         return sub;
     }
     
-    BaseSubsystem newSubsystem(String className) {
+    protected BaseSubsystem newSubsystem(String className) {
         try {
             return (BaseSubsystem)Class.forName(className).newInstance();
         }
@@ -287,6 +300,19 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
         }
     }
     
+    public static boolean classAvailable(String name) {
+        try {
+            Class.forName(name);
+            return true;
+        }
+        catch (ClassNotFoundException e) {
+            return false;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //--------------- Item registration ----------------------------------------------------------
     
     public Item newItem(String name) {
@@ -465,19 +491,19 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
 
     //--------------- Villager registration -------------------------------------------------
     
-    static class VSBinding extends IDBinding<ResourceLocation> {};
-    
-    public List<VSBinding> registeredVillagers = new ArrayList<VSBinding>();
-    
-    int addVillager(String name, ResourceLocation skin) {
-        int id = config.getVillager(name);
-        VSBinding b = new VSBinding();
-        b.id = id;
-        b.object = skin;
-        registeredVillagers.add(b);
-        return id;
-    }
-    
+//     static class VSBinding extends IDBinding<ResourceLocation> {};
+//     
+//     public List<VSBinding> registeredVillagers = new ArrayList<VSBinding>();
+//     
+//     int addVillager(String name, ResourceLocation skin) {
+//         int id = config.getVillager(name);
+//         VSBinding b = new VSBinding();
+//         b.id = id;
+//         b.object = skin;
+//         registeredVillagers.add(b);
+//         return id;
+//     }
+//     
 //  void addTradeHandler(int villagerID, IVillageTradeHandler handler) {
 //      VillagerRegistry.instance().registerVillageTradeHandler(villagerID, handler);
 //  }

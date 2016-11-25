@@ -24,7 +24,7 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 
 	// Cannot have any per-render state, because it may be
 	// called from more than one thread.
-
+	
 	@Override
 	public void renderBlock(IBlockAccess world, BlockPos pos, IBlockState state, IRenderTarget target,
 		EnumWorldBlockLayer layer, Trans3 t)

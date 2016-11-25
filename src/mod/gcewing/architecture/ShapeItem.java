@@ -31,6 +31,15 @@ public class ShapeItem extends ItemBlock {
 		super(block);
 	}
 	
+    /**
+     * Converts the given ItemStack damage value into a metadata value to be placed in the world when this Item is
+     * placed as a Block (mostly used with ItemBlocks).
+     */
+	@Override
+    public int getMetadata(int damage) {
+        return damage;
+    }
+
 	@Override
 	public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos,
 		EnumFacing face, float hitX, float hitY, float hitZ, IBlockState newState)
@@ -76,32 +85,5 @@ public class ShapeItem extends ItemBlock {
 				lines.add(Utils.displayNameOfBlock(baseBlock, baseMetadata));
 		}
 	}
-
-//	@Override
-//	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean par4) {
-//		NBTTagCompound tag = stack.getTagCompound();
-//		if (tag != null) {
-//			int id = tag.getInteger("Shape");
-//			Block baseBlock = Block.getBlockFromName(tag.getString("BaseName"));
-//			int baseMetadata = tag.getInteger("BaseData");
-//			Shape shape = Shape.forId(id);
-//			if (shape != null)
-//				lines.set(0, shape.title);
-//			else
-//				lines.set(0, lines.get(0) + " (" + id + ")");
-//			if (baseBlock != null) {
-//				String baseName = null;
-//				Item baseItem = Item.getItemFromBlock(baseBlock);
-//				if (baseItem != null) {
-//					ItemStack baseStack = new ItemStack(baseItem, 1, baseMetadata);
-//					baseName = baseStack.getDisplayName();
-//				}
-//				if (baseName == null)
-//					baseName = baseBlock.getLocalizedName();
-//				String desc = "Cut from " + baseName;
-//				lines.add(desc);
-//			}
-//		}
-//	}
 
 }

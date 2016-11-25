@@ -166,7 +166,7 @@ public class SawbenchGui extends BaseGui.Screen {
 			glPushMatrix();
 			glTranslatef(materialUsageLeft, materialUsageTop, 0);
 			glScalef(0.5f, 0.5f, 1.0f);
-			drawString(String.format("%s makes %s", shape.materialUsed, shape.itemsProduced), 0, 0);
+			drawString(String.format("%s makes %s", te.materialMultiple(), te.resultMultiple()), 0, 0);
 			glPopMatrix();
 		}
 	}

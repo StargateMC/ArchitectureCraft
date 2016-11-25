@@ -27,6 +27,8 @@ public class SawbenchContainer extends BaseContainer {
 	public static int outputSlotTop = 57;
 
 	SawbenchTE te;
+	SlotRange sawbenchSlotRange;
+	Slot materialSlot, resultSlot;
 	
 	public static Container create(EntityPlayer player, World world, BlockPos pos) {
 		TileEntity te = world.getTileEntity(pos);
@@ -39,8 +41,10 @@ public class SawbenchContainer extends BaseContainer {
 	public SawbenchContainer(EntityPlayer player, SawbenchTE te) {
 		super(guWidth, guiHeight);
 		this.te = te;
-		addSlotToContainer(new Slot(te, 0, inputSlotLeft, inputSlotTop));
-		addSlotToContainer(new SlotSawbenchResult(te, 1, outputSlotLeft, outputSlotTop));
+		sawbenchSlotRange = new SlotRange();
+		materialSlot = addSlotToContainer(new Slot(te, 0, inputSlotLeft, inputSlotTop));
+		resultSlot = addSlotToContainer(new SlotSawbenchResult(te, 1, outputSlotLeft, outputSlotTop));
+		sawbenchSlotRange.end();
 		addPlayerSlots(player, 8, guiHeight - 81);
 	}
 	
@@ -49,15 +53,13 @@ public class SawbenchContainer extends BaseContainer {
 		return this.te.isUseableByPlayer(player);
 	}
 
-//	/**
-//	 * Called to transfer a stack from one inventory to the other eg. when shift clicking.
-//	 */
-//	 
-//	@Override
-//	public ItemStack transferStackInSlot(EntityPlayer player, int par1) {
-//		// TODO
-//		return null;
-//	}
+	@Override
+	protected SlotRange transferSlotRange(int srcSlotIndex, ItemStack stack) {
+	    if (playerSlotRange.contains(srcSlotIndex))
+	        return sawbenchSlotRange;
+	    else
+	        return playerSlotRange;
+	}
 	
 	//
 	//   Server
@@ -83,16 +85,7 @@ public class SawbenchContainer extends BaseContainer {
 				}
 			}
 		}
-//		for (Object crafter : crafters)
-//			sendStateTo((ICrafting)crafter);
 	}
-
-//	void sendStateTo(ICrafting crafter) {
-//		//System.out.printf("SawbenchContainer.sendStateTo: %s; selectedShape = %d\n", crafter, te.selectedShape);
-//		crafter.sendProgressBarUpdate(this, 0, te.selectedPage);
-//		crafter.sendProgressBarUpdate(this, 1, te.selectedSlots[selectedPage]);
-//		crafter.sendProgressBarUpdate(this, 2, te.pendingMaterialUsage ? 1 : 0);
-//	}
 	
 	@ServerMessageHandler("SelectShape")
 	public void onSelectShape(EntityPlayer player, ChannelInput data) {
@@ -117,15 +110,33 @@ public class SawbenchContainer extends BaseContainer {
 			super.putStackInSlot(i, stack);
 	}
 
-//	@Override
-//	public void updateProgressBar(int i, int value) {
-//		//System.out.printf("SawbenchContainer.updateProgressBar: %d %d\n", i, value);
-//		switch (i) {
-//			case 0: te.selectedPage = value;
-//			case 1: te.selectedSlots[selectedPage] = value;
-//			case 2: te.pendingMaterialUsage = value != 0;
-//		}
-//	}
+    // Default transferStackInSlot does not invoke decrStackSize, so we need this
+    // to get pending material used.
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        Slot slot = getSlot(index);
+        if (slot == resultSlot)
+            return transferStackInResultSlot(player, index);
+        else
+            return super.transferStackInSlot(player, index);
+    }
+    
+    protected ItemStack transferStackInResultSlot(EntityPlayer player, int index) {
+        //if (!te.getWorld().isRemote)
+        //    System.out.printf("SawbenchContainer.transferStackInSlot: %s material %s result %s\n",
+        //        index, te.getStackInSlot(te.materialSlot), te.getStackInSlot(te.resultSlot));
+        boolean materialWasPending = te.pendingMaterialUsage;
+        ItemStack origMaterialStack = te.usePendingMaterial();
+        ItemStack result = super.transferStackInSlot(player, index);
+        //if (!te.getWorld().isRemote)
+        //    System.out.printf(
+        //        "SawbenchContainer.transferStackInSlot: returning %s material %s result %s\n",
+        //        result, te.getStackInSlot(te.materialSlot), te.getStackInSlot(te.resultSlot));
+        if (materialWasPending)
+            te.returnUnusedMaterial(origMaterialStack);
+        return result;
+    }
+
 
 }
 
@@ -162,5 +173,3 @@ class SlotSawbenchResult extends SlotSawbench {
 	}
 
 }
-	
-	

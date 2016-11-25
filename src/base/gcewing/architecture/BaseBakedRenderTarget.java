@@ -146,7 +146,10 @@ public class BaseBakedRenderTarget extends BaseRenderTarget {
             new Vector3f(10f, -45f, 170f),
             new Vector3f(0f, 1.5f/16f, -2.75f/16f),
             new Vector3f(0.375f, 0.375f, 0.375f)), // thirdPerson
-        ItemCameraTransforms.DEFAULT.firstPerson,
+        new ItemTransformVec3f(
+            new Vector3f(0, 180, 0),
+            new Vector3f(0, 0, 0),
+            new Vector3f(1, 1, 1)), //firstPerson
         ItemCameraTransforms.DEFAULT.head,
         ItemCameraTransforms.DEFAULT.gui,
         ItemCameraTransforms.DEFAULT.ground,
