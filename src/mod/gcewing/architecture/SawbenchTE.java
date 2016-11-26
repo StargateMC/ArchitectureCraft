@@ -208,8 +208,10 @@ public class SawbenchTE extends BaseTileInventory {
     }
     
     protected boolean isAcceptableMaterial(Block block) {
-        if (block == Blocks.glass || block == Blocks.stained_glass || block instanceof BlockSlab)
-            return true;
+        //System.out.printf("SawbenchTE.isAcceptableMaterial: %s\n", block);
+        if (block == Blocks.glass || block == Blocks.stained_glass || block instanceof BlockSlab ||
+            block.getUnlocalizedName().startsWith("tile.chisel.stained_glass"))
+                return true;
         return block.isFullCube() && !block.hasTileEntity();
     }
 
