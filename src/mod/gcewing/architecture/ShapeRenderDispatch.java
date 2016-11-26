@@ -33,12 +33,14 @@ public class ShapeRenderDispatch implements ICustomRenderer {
 		ShapeTE te = ShapeTE.get(world, pos);
 		if (te != null) {
 			Trans3 t2 = t.t(te.localToGlobalRotation());
-			boolean renderBase = te.baseBlockState != null
-				&& te.baseBlockState.getBlock().getBlockLayer() == layer;
-			boolean renderSecondary = te.secondaryBlockState != null
-				&& te.secondaryBlockState.getBlock().getBlockLayer() == layer;
+			boolean renderBase = canRenderInLayer(te.baseBlockState, layer);
+			boolean renderSecondary = canRenderInLayer(te.secondaryBlockState, layer);
 			renderShapeTE(te, target, t2, renderBase, renderSecondary);
 		}
+	}
+	
+	protected boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+	    return state != null && state.getBlock().canRenderInLayer(state, layer);
 	}
 
 	@Override	
