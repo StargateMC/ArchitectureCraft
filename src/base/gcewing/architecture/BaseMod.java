@@ -67,6 +67,7 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
         int getNumSubtypes();
         Trans3 localToGlobalTransformation(IBlockAccess world, BlockPos pos, IBlockState state, Vector3 origin);
         IBlockState getParticleState(IBlockAccess world, BlockPos pos);
+        Trans3 itemTransformation();
     }
     
     interface IItem extends ITextureConsumer {
@@ -178,6 +179,7 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
             sub.registerContainers();
             sub.registerEntities();
             sub.registerVillagers();
+            sub.registerSounds();
         }
         if (client != null)
             client.preInit(e);
@@ -391,6 +393,8 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
             //System.out.printf("BaseMod.addBlock: Setting creativeTab to %s\n", creativeTab);
             block.setCreativeTab(creativeTab);
         }
+        if (block instanceof BaseBlock)
+            ((BaseBlock)block).mod = this;
         registeredBlocks.add(block);
         return block;
     }
@@ -517,8 +521,23 @@ public class BaseMod<CLIENT extends BaseModClient<? extends BaseMod>>
 //      VillagerRegistry.instance().registerVillageTradeHandler(villagerID, handler);
 //  }
     
-    //--------------- Resources ----------------------------------------------------------
+    //--------------- Sound Registration -------------------------------------------------
     
+    public SoundEvent newSound(String name) {
+        try {
+            ResourceLocation loc = resourceLocation(name);
+            SoundEvent result = new SoundEvent(loc);
+            result.setRegistryName(loc);
+            GameData.getSoundEventRegistry().register(result);
+            return result;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    //--------------- Resources ----------------------------------------------------------
+
     public ResourceLocation resourceLocation(String path) {
         return new ResourceLocation(assetKey, path);
     }

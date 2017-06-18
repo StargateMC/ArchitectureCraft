@@ -146,7 +146,7 @@ public abstract class ShapeKind {
 			if (dx >= 0)
 				te.setTurn((te.turn + 1) % 4);
 		}
-		te.markChanged();
+		te.markBlockChanged();
 	}
 	
 	public EnumFacing zoneHit(EnumFacing face, Vector3 hit) {

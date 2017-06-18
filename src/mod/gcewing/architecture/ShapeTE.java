@@ -80,7 +80,7 @@ public class ShapeTE extends BaseTileEntity {
 			disabledConnections &= ~bit;
 		else
 			disabledConnections |= bit;
-		markChanged();
+		markBlockChanged();
 	}
 	
 	public void toggleConnectionGlobal(EnumFacing dir) {
@@ -210,7 +210,7 @@ public class ShapeTE extends BaseTileEntity {
 	
 	public void setSecondaryMaterial(IBlockState state) {
 		secondaryBlockState = state;
-		markChanged();
+		markBlockChanged();
 	}
 	
 	public boolean canRenderInLayer(BlockRenderLayer layer) {
