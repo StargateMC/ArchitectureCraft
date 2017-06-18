@@ -127,34 +127,34 @@ public class ShapeBlock extends BaseBlock<ShapeTE> {
 	protected List<AxisAlignedBB> getGlobalCollisionBoxes(IBlockAccess world, BlockPos pos,
 		IBlockState state, Entity entity)
 	{
-		ShapeTE te = (ShapeTE)world.getTileEntity(pos);
+		ShapeTE te = getTileEntity(world, pos);
 		if (te != null) {
 			Trans3 t = te.localToGlobalTransformation();
 			return getCollisionBoxes(te, world, pos, state, t, entity);
 		}
-		return null;
+		return new ArrayList<AxisAlignedBB>();
 	}
 	
 	protected List<AxisAlignedBB> getLocalCollisionBoxes(IBlockAccess world, BlockPos pos,
 		IBlockState state, Entity entity)
 	{
-		ShapeTE te = (ShapeTE)world.getTileEntity(pos);
+		ShapeTE te = getTileEntity(world, pos);
 		if (te != null) {
 			Trans3 t = te.localToGlobalTransformation(Vector3.zero);
 			return getCollisionBoxes(te, world, pos, state, t, entity);
 		}
-		return null;
+		return new ArrayList<AxisAlignedBB>();
 	}
 	
 	protected AxisAlignedBB getLocalBounds(IBlockAccess world, BlockPos pos,
 		IBlockState state, Entity entity)
 	{
-		ShapeTE te = (ShapeTE)world.getTileEntity(pos);
+		ShapeTE te = getTileEntity(world, pos);
 		if (te != null) {
 			Trans3 t = te.localToGlobalTransformation(Vector3.blockCenter);
 			return te.shape.kind.getBounds(te, world, pos, state, entity, t);
 		}
-		return null;
+		return null; // Causes getBoundingBox to fall back on super implementation
 	}
 
 	protected List<AxisAlignedBB> getCollisionBoxes(ShapeTE te,
